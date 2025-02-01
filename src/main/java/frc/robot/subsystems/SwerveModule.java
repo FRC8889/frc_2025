@@ -22,19 +22,19 @@ public class SwerveModule {
 
     private final PIDController turningPidController;
 
-    private final AnalogInput absoluteEncoder;
+    private final CANcoder cancoder;
     private final int absoluteEncoderReversed;
     private final double absoluteEncoderOffsetRad;
 
-    public SwerveModule(int driveMotorId, int turningMotorId, int absoluteEncoderId, double absoluteEncoderOffset, int absoluteEncoderReversed) {
+    public SwerveModule(int driveMotorId, int turningMotorId, int cancoderid, double absoluteEncoderOffset, int absoluteEncoderReversed) {
         
         this.absoluteEncoderOffsetRad = absoluteEncoderOffset;
         this.absoluteEncoderReversed = absoluteEncoderReversed;
-        absoluteEncoder = new AnalogInput(absoluteEncoderId);
+        cancoder = new CANcoder(cancoderid);
 
         driveMotor = new TalonFX(driveMotorId);
         turningMotor = new TalonFX(turningMotorId);
-        // Temporary "encoder" values until we get cancoders
+
         driveEncoder = driveMotor.getPosition().getValueAsDouble();
         turningEncoder = turningMotor.getPosition().getValueAsDouble();
 
@@ -63,14 +63,14 @@ public class SwerveModule {
 
     public double getAbsoluteEncoderRad() {
         //temporary until we have cancoders
-        return -turningMotor.getPosition().getValueAsDouble() * ModuleConstants.kTurningEncoderRot2Rad;
+        return cancoder.getAbsolutePosition().getValueAsDouble() * ModuleConstants.kCANcoderRot2Rad;
     }
 
     public void resetEncoders() {
         driveMotor.setPosition(0);
         //Convert the thing from rads to rotations before you set it because talons are dumb
         //Would be "getAbsoluteEncoderRad() / 6.283185" instead of 0 with cancoders
-        turningMotor.setPosition(0);
+        turningMotor.setPosition(getAbsoluteEncoderRad() / ModuleConstants.kCANcoderRot2Rad);
     }
 
     public SwerveModuleState getState() {
@@ -85,7 +85,7 @@ public class SwerveModule {
         state = SwerveModuleState.optimize(state, getState().angle);
         driveMotor.set(state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
         turningMotor.set(turningPidController.calculate(getTurningPosition(), state.angle.getRadians()));
-        SmartDashboard.putString("Swerve[" + absoluteEncoder.getChannel() + "] state", state.toString());
+        SmartDashboard.putString("Swerve[" + cancoder.getDeviceID() + "] state", state.toString() + getAbsoluteEncoderRad());
     }
 
     public void stop() {
