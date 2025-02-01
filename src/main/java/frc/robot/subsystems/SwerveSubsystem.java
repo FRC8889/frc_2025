@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.studica.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -38,7 +39,8 @@ public class SwerveSubsystem extends SubsystemBase {
         DriveConstants.kBREncoderOffset,
         DriveConstants.kBREncoderReversed);
     
-    private AHRS gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
+    private AHRS gyr = new AHRS(AHRS.NavXComType.kMXP_SPI);
+    private Pigeon2 gyro = new Pigeon2(1);
 
     public SwerveSubsystem() {
         new Thread(() -> {
@@ -55,7 +57,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public double getHeading() {
-        return Math.IEEEremainder(gyro.getAngle(), 360);
+        return Math.IEEEremainder(-gyro.getYaw().getValueAsDouble(), 360);
     }
 
     public Rotation2d getRotation2d() {
@@ -65,6 +67,8 @@ public class SwerveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Robot Heading", getHeading());
+        SmartDashboard.putNumber("Robot Heading Old", gyr.getAngle());
+
     }
 
     public void stopModules() {
