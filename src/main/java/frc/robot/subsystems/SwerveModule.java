@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,7 +17,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 public class SwerveModule {
     private final TalonFX driveMotor;
-    private final TalonFX turningMotor;
+    private final SparkMax turningMotor;
 
     private final Double driveEncoder;
     private final Double turningEncoder;
@@ -33,10 +35,10 @@ public class SwerveModule {
         cancoder = new CANcoder(cancoderid);
 
         driveMotor = new TalonFX(driveMotorId);
-        turningMotor = new TalonFX(turningMotorId);
+        turningMotor = new SparkMax(turningMotorId, MotorType.kBrushless);
 
         driveEncoder = driveMotor.getPosition().getValueAsDouble();
-        turningEncoder = turningMotor.getPosition().getValueAsDouble();
+        turningEncoder = turningMotor.getEncoder().getPosition();
 
         turningPidController = new PIDController(ModuleConstants.kPTurning, 0.001, 0.0075);        
         turningPidController.enableContinuousInput(-Math.PI, Math.PI);
@@ -50,7 +52,7 @@ public class SwerveModule {
     }
 
     public double getTurningPosition() {
-        return turningMotor.getPosition().getValueAsDouble() * ModuleConstants.kTurningEncoderRot2Rad;
+        return turningMotor.getEncoder().getPosition() * ModuleConstants.kTurningEncoderRot2Rad;
     }
 
     public double getDriveVelocity() {
@@ -58,7 +60,7 @@ public class SwerveModule {
     }
     
     public double getTurningVelocity() {
-        return turningMotor.getVelocity().getValueAsDouble() * ModuleConstants.kTurningEncoderRpm2RadPerSec;
+        return turningMotor.getEncoder().getVelocity() * ModuleConstants.kTurningEncoderRpm2RadPerSec;
     }
 
     public double getAbsoluteEncoderRad() {
@@ -70,7 +72,7 @@ public class SwerveModule {
         driveMotor.setPosition(0);
         //Convert the thing from rads to rotations before you set it because talons are dumb
         //Would be "getAbsoluteEncoderRad() / 6.283185" instead of 0 with cancoders
-        turningMotor.setPosition(getAbsoluteEncoderRad() / ModuleConstants.kCANcoderRot2Rad);
+        turningMotor.getEncoder().setPosition(getAbsoluteEncoderRad() / ModuleConstants.kCANcoderRot2Rad);
     }
 
     public SwerveModuleState getState() {

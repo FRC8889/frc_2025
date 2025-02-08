@@ -4,20 +4,22 @@
 
 package frc.robot;
 
+import java.util.ArrayList;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OConstants;
-import frc.robot.commands.PidNeoCmd;
 import frc.robot.commands.SwerveJoystickCmd;
-import frc.robot.subsystems.RandomNeo;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.commands.ElevatorCommand;
+import frc.robot.subsystems.ElevatorSubsystem;
 
 public class RobotContainer {
 
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-    private final RandomNeo randomNeo = new RandomNeo();
+    private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
     private final Joystick driverJoystick = new Joystick(OConstants.kDriverControllerPort);
 
     public RobotContainer() {
@@ -29,14 +31,20 @@ public class RobotContainer {
             () -> !driverJoystick.getRawButton(OConstants.kDriverFieldOrientedButtonId)
         ));
 
+
+           // Set ElevatorCommand as the default command for the ElevatorSubsystem
+           elevatorSubsystem.setDefaultCommand(new ElevatorCommand(elevatorSubsystem));
+
         configureBindings();
     }
 
     private void configureBindings() {
         new JoystickButton(driverJoystick, 2).whileTrue(new RunCommand(() -> swerveSubsystem.zeroHeading()));
-        new JoystickButton(driverJoystick, 3).whileTrue(new PidNeoCmd(randomNeo, 0));
-        new JoystickButton(driverJoystick, 4).whileTrue(new PidNeoCmd(randomNeo, 10));
 
+  
+        // Button 6 increments the stage
+        new JoystickButton(driverJoystick, 1).whileTrue(new RunCommand(() -> elevatorSubsystem.increaseStage(), elevatorSubsystem));
+          
     }
 
     public Command getAutonomousCommand() {
