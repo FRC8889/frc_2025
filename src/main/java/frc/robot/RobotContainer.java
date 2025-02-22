@@ -6,6 +6,7 @@ package frc.robot;
 
 import java.util.ArrayList;
 
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -42,8 +43,8 @@ public class RobotContainer {
         new JoystickButton(driverJoystick, 2).whileTrue(new RunCommand(() -> swerveSubsystem.zeroHeading()));
 
   
-        // Button 6 increments the stage
-        new JoystickButton(driverJoystick, 1).whileTrue(new RunCommand(() -> elevatorSubsystem.increaseStage(), elevatorSubsystem));
+        // Button 6 changes the stage
+        new JoystickButton(driverJoystick, 1).debounce(0.1).whileTrue(new RunCommand(() -> elevatorSubsystem.increaseStage(), elevatorSubsystem));
           
     }
 
