@@ -3,6 +3,8 @@ package frc.robot.commands;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ElevatorSubsystem;
+import edu.wpi.first.wpilibj.DriverStation;
+
 
 
 public class ElevatorCommand extends Command {
@@ -28,7 +30,7 @@ public class ElevatorCommand extends Command {
 
         // Get setpoint and current encoder position
         double Elevatorsetpoint = elevatorSubsystem.getElevatorCurrentSetpoint();
-        double ElevatorcurrentPosition = elevatorSubsystem.getElevatorEncoder();
+        double ElevatorcurrentPosition = (elevatorSubsystem.getElevator1Encoder() + elevatorSubsystem.getElevator2Encoder())/2;
 
         double ClawAngleSetpoint = elevatorSubsystem.getClawAngleCurrentSetpoint();
         double ClawAnglecurrentPosition = elevatorSubsystem.getClawAngleEncoder();
@@ -68,6 +70,7 @@ public class ElevatorCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return false; // Command runs until explicitly stopped
-    }
+   // Only run in teleop; finish immediately otherwise.
+        return !DriverStation.isTeleop();   
+     }
 }

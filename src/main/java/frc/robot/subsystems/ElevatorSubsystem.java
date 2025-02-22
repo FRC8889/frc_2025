@@ -5,11 +5,11 @@ import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
-    private final SparkMax elevatorMotor = new SparkMax(9, MotorType.kBrushless);
+    private final SparkMax elevatorMotor1 = new SparkMax(9, MotorType.kBrushless);
+    private final SparkMax elevatorMotor2 = new SparkMax(5, MotorType.kBrushless);
     private final SparkMax ClawAngleMotor = new SparkMax(8, MotorType.kBrushless);
     private final double[] elevatorsetpoints = {10, 20, 30, 40}; // Setpoints for each Elevator stage
     private final double[] ClawAngleSetpoints = {10, 30, 30, 40};  // Setpoints for each claw position
@@ -25,7 +25,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void periodic() {
         // Display current stage and encoder value on SmartDashboard
         SmartDashboard.putNumber("Elevator Stage", elevatorStage);
-        SmartDashboard.putNumber("Elevator Encoder", getElevatorEncoder());
+        SmartDashboard.putNumber("ElevatorMotor1 Encoder", getElevator1Encoder());
+        SmartDashboard.putNumber("ElevatorMotor2 Encoder", getElevator2Encoder());
         SmartDashboard.putNumber("Claw Angle", getClawAngleEncoder());
         SmartDashboard.putNumber("setpoint", getElevatorCurrentSetpoint());
     }
@@ -35,16 +36,13 @@ public class ElevatorSubsystem extends SubsystemBase {
      */
     public void increaseStage() {
 
-    //    if(elevatorstagecomplete) 
-    //    {
             elevatorStage++;
             if (elevatorStage > 4) {
                 elevatorStage = 1; // Loop back to stage 1
-            }
-        // }
-    
+            } 
     }
 
+    
     public double getClawAngleCurrentSetpoint() {
         // Update flipper motor based on stage
        return ClawAngleSetpoints[elevatorStage - 1];
@@ -64,8 +62,12 @@ public class ElevatorSubsystem extends SubsystemBase {
      * 
      * @return The encoder position from the motor.
      */
-    public double getElevatorEncoder() {
-        return elevatorMotor.getEncoder().getPosition();
+    public double getElevator1Encoder() {
+        return elevatorMotor1.getEncoder().getPosition();
+    }
+
+    public double getElevator2Encoder() {
+        return elevatorMotor2.getEncoder().getPosition();
     }
 
     public double getClawAngleEncoder() {
@@ -77,7 +79,9 @@ public class ElevatorSubsystem extends SubsystemBase {
      * @param speed The speed to set the motor (-1.0 to 1.0).
      */
     public void setElevatorMotor(double speed) {
-        elevatorMotor.set(speed);
+        elevatorMotor1.set(speed);
+        elevatorMotor2.set(-speed);
+
     }
 
     public void setClawAngleMotor(double speed) {
@@ -88,13 +92,11 @@ public class ElevatorSubsystem extends SubsystemBase {
      * Stop the Elevator and Claw motor.
      */
     public void stopMotor() {
-        elevatorMotor.set(0);
+        elevatorMotor1.set(0);
         ClawAngleMotor.set(0);
     }
 
-    // public void setClawAnglePosition(double position) {
-    //    ClawAngleMotor.getEncoder().setPosition(position);
-    // }
+
 
 
 }
