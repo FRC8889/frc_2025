@@ -32,29 +32,29 @@ public final class Constants {
             new Translation2d(-kWheelBase / 2, -kTrackWidth / 2) //
         );
 
-        public static final int kFLDriveID = 2;
+        public static final int kFLDriveID = 1;
         public static final int KFLTurningID = 1;
         public static final int kFLEncoderID = 1;
-        public static final double kFLEncoderOffset = 0.0;
-        public static final int kFLEncoderReversed = 0;
+        public static final double kFLEncoderOffset = -0.35 + Math.PI;
+        public static final int kFLEncoderReversed = 1;
 
-        public static final int kFRDriveID = 4;
-        public static final int KFRTurningID = 3;
+        public static final int kFRDriveID = 2;
+        public static final int KFRTurningID = 2;
         public static final int kFREncoderID = 2;
-        public static final double kFREncoderOffset = 0.0;
-        public static final int kFREncoderReversed = 0;
+        public static final double kFREncoderOffset = 0.65;
+        public static final int kFREncoderReversed = 1;
 
-        public static final int kBLDriveID = 6;
-        public static final int KBLTurningID = 5;
-        public static final int kBLEncoderID = 3;
-        public static final double kBLEncoderOffset = 0.0;
-        public static final int kBLEncoderReversed = 0;
+        public static final int kBLDriveID = 4;
+        public static final int KBLTurningID = 4;
+        public static final int kBLEncoderID = 4;
+        public static final double kBLEncoderOffset = -0.35;
+        public static final int kBLEncoderReversed = 1;
 
-        public static final int kBRDriveID = 8;
-        public static final int KBRTurningID = 7;
-        public static final int kBREncoderID = 4;
-        public static final double kBREncoderOffset = 0.0;
-        public static final int kBREncoderReversed = 0;
+        public static final int kBRDriveID = 3;
+        public static final int KBRTurningID = 3;
+        public static final int kBREncoderID = 3;
+        public static final double kBREncoderOffset = 0.35 + Math.PI;
+        public static final int kBREncoderReversed = 1;
 
     }
 

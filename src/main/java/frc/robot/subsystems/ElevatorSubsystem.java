@@ -1,8 +1,13 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -11,14 +16,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final SparkMax elevatorMotor1 = new SparkMax(5, MotorType.kBrushless);
     private final SparkMax elevatorMotor2 = new SparkMax(6, MotorType.kBrushless);
     private final SparkMax ClawAngleMotor = new SparkMax(7, MotorType.kBrushless);
-    private final double[] elevatorsetpoints = {10, 20, 30, 40}; // Setpoints for each Elevator stage
-    private final double[] ClawAngleSetpoints = {10, 30, 30, 40};  // Setpoints for each claw position
+    private final double[] elevatorsetpoints = {2, 15, 45, 95}; // Setpoints for each Elevator stage
+    private final double[] ClawAngleSetpoints = {0, 1.66, 1.66, 4.7};  // Setpoints for each claw position
     private int elevatorStage = 1; // Current stage (1 to 4)
     public boolean elevatorstagecomplete = true;
     
 
     public ElevatorSubsystem() {
         // Initialize motor if needed, like setting idle mode
+
     }
 
     @Override
@@ -79,8 +85,8 @@ public class ElevatorSubsystem extends SubsystemBase {
      * @param speed The speed to set the motor (-1.0 to 1.0).
      */
     public void setElevatorMotor(double speed) {
-        elevatorMotor1.set(speed);
-        elevatorMotor2.set(-speed);
+        elevatorMotor1.set(-speed);
+        elevatorMotor2.set(speed);
 
     }
 

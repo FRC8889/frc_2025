@@ -65,14 +65,14 @@ public class SwerveModule {
 
     public double getAbsoluteEncoderRad() {
         //temporary until we have cancoders
-        return cancoder.getAbsolutePosition().getValueAsDouble() * ModuleConstants.kCANcoderRot2Rad;
+        return absoluteEncoderOffsetRad + (cancoder.getAbsolutePosition().getValueAsDouble() * -absoluteEncoderReversed * ModuleConstants.kCANcoderRot2Rad);
     }
 
     public void resetEncoders() {
         driveMotor.setPosition(0);
         //Convert the thing from rads to rotations before you set it because talons are dumb
         //Would be "getAbsoluteEncoderRad() / 6.283185" instead of 0 with cancoders
-        turningMotor.getEncoder().setPosition(getAbsoluteEncoderRad() / ModuleConstants.kCANcoderRot2Rad);
+        turningMotor.getEncoder().setPosition(21.428 * getAbsoluteEncoderRad() / ModuleConstants.kCANcoderRot2Rad);
     }
 
     public SwerveModuleState getState() {

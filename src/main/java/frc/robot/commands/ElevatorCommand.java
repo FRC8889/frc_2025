@@ -30,27 +30,27 @@ public class ElevatorCommand extends Command {
 
         // Get setpoint and current encoder position
         double Elevatorsetpoint = elevatorSubsystem.getElevatorCurrentSetpoint();
-        double ElevatorcurrentPosition = (elevatorSubsystem.getElevator1Encoder() + elevatorSubsystem.getElevator2Encoder())/2;
+        double ElevatorcurrentPosition = elevatorSubsystem.getElevator1Encoder();
 
-        double ClawAngleSetpoint = elevatorSubsystem.getClawAngleCurrentSetpoint();
-        double ClawAnglecurrentPosition = elevatorSubsystem.getClawAngleEncoder();
+        // double ClawAngleSetpoint = elevatorSubsystem.getClawAngleCurrentSetpoint();
+        // double ClawAnglecurrentPosition = elevatorSubsystem.getClawAngleEncoder();
 
 
 
         // Calculate speed using PID
         // double ElevatorSpeed = pidController.calculate(ElevatorcurrentPosition, Elevatorsetpoint);
         // double ClawAngleSpeed = pidController.calculate(ClawAnglecurrentPosition, ClawAngleSetpoint);
-        double ElevatorSpeed = 0.1 * (Elevatorsetpoint - ElevatorcurrentPosition);
-        double ClawAngleSpeed = 0.1 * (ClawAngleSetpoint - ClawAnglecurrentPosition);
+        double ElevatorSpeed = 0.02 * (Elevatorsetpoint - ElevatorcurrentPosition);
+        // double ClawAngleSpeed = 0.02 * (ClawAngleSetpoint - ClawAnglecurrentPosition);
 
         // Clamp speed to safe range
-        ElevatorSpeed = Math.max(-0.5, Math.min(0.5, ElevatorSpeed));
-        ClawAngleSpeed = Math.max(-0.25, Math.min(0.25, ClawAngleSpeed));
+        ElevatorSpeed = Math.max(-0.05, Math.min(0.05, ElevatorSpeed));
+        // ClawAngleSpeed = Math.max(-0.025, Math.min(0.025, ClawAngleSpeed));
     
 
         // Set motor speed
         elevatorSubsystem.setElevatorMotor(ElevatorSpeed);
-        elevatorSubsystem.setClawAngleMotor(ClawAngleSpeed);
+        // elevatorSubsystem.setClawAngleMotor(ClawAngleSpeed);
 
     //     if (ClawAnglecurrentPosition == elevatorSubsystem.getClawAngleCurrentSetpoint() && ElevatorSpeed == pidController.calculate(ElevatorcurrentPosition, Elevatorsetpoint ))
     //     {

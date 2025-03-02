@@ -8,6 +8,7 @@ package frc.robot;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OConstants;
@@ -34,18 +35,18 @@ public class RobotContainer {
         ));
 
 
-        //    // Set ElevatorCommand as the default command for the ElevatorSubsystem
-        //    elevatorSubsystem.setDefaultCommand(new ElevatorCommand(elevatorSubsystem));
+           // Set ElevatorCommand as the default command for the ElevatorSubsystem
+           elevatorSubsystem.setDefaultCommand(new ElevatorCommand(elevatorSubsystem));
 
         configureBindings();
     }
 
     private void configureBindings() {
         new JoystickButton(driverJoystick, 2).whileTrue(new RunCommand(() -> swerveSubsystem.zeroHeading()));
-
+        new JoystickButton(driverJoystick, 4).whileTrue(new RunCommand(() -> swerveSubsystem.resetEncoders()));
   
         // Button X (on playstation the best controller) changes the stage
-        new JoystickButton(driverJoystick, 1).debounce(0.1).whileTrue(new RunCommand(() -> elevatorSubsystem.increaseStage(), elevatorSubsystem));
+        new JoystickButton(driverJoystick, 1).debounce(0.1).onTrue(new InstantCommand(() -> elevatorSubsystem.increaseStage(), elevatorSubsystem));
           
         // Button L1 (on playstation the best controller) picks up coral(not really) spits out algae
         new JoystickButton(driverJoystick, 5).whileTrue(new RunCommand(() -> intakeSubsystem.collectAlgaeOrOuttakeCoral(), intakeSubsystem));
