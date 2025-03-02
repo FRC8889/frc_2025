@@ -39,7 +39,6 @@ public class SwerveSubsystem extends SubsystemBase {
         DriveConstants.kBREncoderOffset,
         DriveConstants.kBREncoderReversed);
     
-    private AHRS gyr = new AHRS(AHRS.NavXComType.kMXP_SPI);
     private Pigeon2 gyro = new Pigeon2(1);
 
     public SwerveSubsystem() {
@@ -67,7 +66,6 @@ public class SwerveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Robot Heading", getHeading());
-        SmartDashboard.putNumber("Robot Heading Old", gyr.getAngle());
 
     }
 

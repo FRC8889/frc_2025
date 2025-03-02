@@ -34,8 +34,8 @@ public class RobotContainer {
         ));
 
 
-           // Set ElevatorCommand as the default command for the ElevatorSubsystem
-           elevatorSubsystem.setDefaultCommand(new ElevatorCommand(elevatorSubsystem));
+        //    // Set ElevatorCommand as the default command for the ElevatorSubsystem
+        //    elevatorSubsystem.setDefaultCommand(new ElevatorCommand(elevatorSubsystem));
 
         configureBindings();
     }

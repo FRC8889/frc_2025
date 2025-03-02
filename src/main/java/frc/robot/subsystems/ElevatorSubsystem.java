@@ -8,9 +8,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
-    private final SparkMax elevatorMotor1 = new SparkMax(9, MotorType.kBrushless);
-    private final SparkMax elevatorMotor2 = new SparkMax(5, MotorType.kBrushless);
-    private final SparkMax ClawAngleMotor = new SparkMax(8, MotorType.kBrushless);
+    private final SparkMax elevatorMotor1 = new SparkMax(5, MotorType.kBrushless);
+    private final SparkMax elevatorMotor2 = new SparkMax(6, MotorType.kBrushless);
+    private final SparkMax ClawAngleMotor = new SparkMax(7, MotorType.kBrushless);
     private final double[] elevatorsetpoints = {10, 20, 30, 40}; // Setpoints for each Elevator stage
     private final double[] ClawAngleSetpoints = {10, 30, 30, 40};  // Setpoints for each claw position
     private int elevatorStage = 1; // Current stage (1 to 4)

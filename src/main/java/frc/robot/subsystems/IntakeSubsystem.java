@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -9,7 +10,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 
 public class IntakeSubsystem extends SubsystemBase {
 
-    private final SparkMax IntakeMotor = new SparkMax(7, MotorType.kBrushless);
+    private final SparkMax IntakeMotor = new SparkMax(8, MotorType.kBrushless);
     private final DigitalInput CoralSensor = new DigitalInput(0);
 
     
