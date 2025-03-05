@@ -48,12 +48,12 @@ public class SwerveModule {
 
     /** Returns drive motor encoder position in meters. */
     public double getDrivePosition() {
-        return driveEncoder * ModuleConstants.kDriveEncoderRot2Meter;
+        return driveMotor.getPosition().getValueAsDouble() * ModuleConstants.kDriveEncoderRot2Meter;
     }
 
     /** Returns turning motor encoder position in radians. */
     public double getTurningPosition() {
-        return turningEncoder * ModuleConstants.kTurningEncoderRot2Rad;
+        return turningMotor.getEncoder().getPosition() * ModuleConstants.kTurningEncoderRot2Rad;
     }
 
     /** Returns drive motor velocity in meters per second. */
