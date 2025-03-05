@@ -3,7 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ManipulatorConstants;
-import frc.robot.Constants.OConstants;
+import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.ClawSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 public class ManuipulatorCommand extends Command {
-    private final Joystick driverJoystick = new Joystick(OConstants.kDriverControllerPort);
+    private final Joystick driverJoystick = new Joystick(OperatorConstants.kDriverControllerPort);
     private boolean CycleStageTogglePressed = false;
     private boolean ClawPositionTogglePressed = false;
     private boolean GamePieceTogglePressed = false;

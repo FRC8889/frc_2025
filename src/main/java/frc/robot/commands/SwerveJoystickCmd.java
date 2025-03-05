@@ -7,7 +7,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OConstants;
+import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 
 public class SwerveJoystickCmd extends Command {
@@ -23,9 +23,9 @@ public class SwerveJoystickCmd extends Command {
         this.ySpdFunction = ySpdFunction;
         this.turningSpdFunction = turningSpdFunction;
         this.fieldOrientedFunction = fieldOrientedFunction;
-        this.xLimiter = new SlewRateLimiter(OConstants.kMaxDriveAcceleration);
-        this.yLimiter = new SlewRateLimiter(OConstants.kMaxDriveAcceleration);
-        this.turningLimiter = new SlewRateLimiter(OConstants.kMaxAngularAcceleration);
+        this.xLimiter = new SlewRateLimiter(OperatorConstants.kMaxDriveAcceleration);
+        this.yLimiter = new SlewRateLimiter(OperatorConstants.kMaxDriveAcceleration);
+        this.turningLimiter = new SlewRateLimiter(OperatorConstants.kMaxAngularAcceleration);
         addRequirements(swerveSubsystem);
     }
 
@@ -42,14 +42,14 @@ public class SwerveJoystickCmd extends Command {
         double turningSpeed = turningSpdFunction.get();
         
         // Deadband
-        xSpeed = Math.abs(xSpeed) > OConstants.kDeadband ? xSpeed : 0;
-        ySpeed = Math.abs(ySpeed) > OConstants.kDeadband ? ySpeed : 0;
-        turningSpeed = Math.abs(turningSpeed) > OConstants.kDeadband ? turningSpeed : 0;
+        xSpeed = Math.abs(xSpeed) > OperatorConstants.kDeadband ? xSpeed : 0;
+        ySpeed = Math.abs(ySpeed) > OperatorConstants.kDeadband ? ySpeed : 0;
+        turningSpeed = Math.abs(turningSpeed) > OperatorConstants.kDeadband ? turningSpeed : 0;
        
         // Rate & speed limit
-        xSpeed = xLimiter.calculate(xSpeed) * OConstants.kMaxDriveSpeedMetersPerSecond;
-        ySpeed = yLimiter.calculate(ySpeed) * OConstants.kMaxDriveSpeedMetersPerSecond;
-        turningSpeed = turningLimiter.calculate(turningSpeed) * OConstants.kMaxAngularSpeedRadiansPerSecond;
+        xSpeed = xLimiter.calculate(xSpeed) * OperatorConstants.kMaxDriveSpeedMetersPerSecond;
+        ySpeed = yLimiter.calculate(ySpeed) * OperatorConstants.kMaxDriveSpeedMetersPerSecond;
+        turningSpeed = turningLimiter.calculate(turningSpeed) * OperatorConstants.kMaxAngularSpeedRadiansPerSecond;
         
         // Create speeds
         ChassisSpeeds chassisSpeeds;
