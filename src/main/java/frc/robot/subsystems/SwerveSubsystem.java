@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.studica.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -51,14 +50,17 @@ public class SwerveSubsystem extends SubsystemBase {
         }).start();
     }
     
+    /** Resets gyro heading. */
     public void zeroHeading() {
         gyro.reset();
     }
 
+    /** Returns gyro heading. */
     public double getHeading() {
         return Math.IEEEremainder(-gyro.getYaw().getValueAsDouble(), 360);
     }
 
+    /** Returns gyro heading as Rotation2d. */
     public Rotation2d getRotation2d() {
         return Rotation2d.fromDegrees(getHeading());
     }
@@ -66,14 +68,26 @@ public class SwerveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Robot Heading", getHeading());
-
+        frontLeft.PrintCancoderValue();
+        frontRight.PrintCancoderValue();
+        backLeft.PrintCancoderValue();
+        backRight.PrintCancoderValue();
     }
 
+    /** Stops all swerve modules. */
     public void stopModules() {
         frontLeft.stop();
         frontRight.stop();
         backLeft.stop();
         backRight.stop();
+    }
+    
+    /** Resets all swerve module encoders. */
+    public void resetEncoders() {
+        frontLeft.resetEncoders();
+        frontRight.resetEncoders();
+        backLeft.resetEncoders();
+        backRight.resetEncoders();
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {

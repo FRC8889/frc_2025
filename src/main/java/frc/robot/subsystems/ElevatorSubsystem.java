@@ -1,8 +1,11 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -10,90 +13,78 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     private final SparkMax elevatorMotor1 = new SparkMax(5, MotorType.kBrushless);
     private final SparkMax elevatorMotor2 = new SparkMax(6, MotorType.kBrushless);
-    private final SparkMax ClawAngleMotor = new SparkMax(7, MotorType.kBrushless);
-    private final double[] elevatorsetpoints = {10, 20, 30, 40}; // Setpoints for each Elevator stage
-    private final double[] ClawAngleSetpoints = {10, 30, 30, 40};  // Setpoints for each claw position
-    private int elevatorStage = 1; // Current stage (1 to 4)
-    public boolean elevatorstagecomplete = true;
-    
+    private final PIDController elevatorPIDController;
+    private boolean isGamePieceCoral = true; // true for coral, false for algae
+    public double elevatorRunSpeed = 0;
+
 
     public ElevatorSubsystem() {
-        // Initialize motor if needed, like setting idle mode
+        // Initialize motors and pid for whatever (DO NOT SET THE MOTOR CONFIGS IN CODE OR YOU WILL BREAK THE ROBOT AGAIN BY ACCIDENT)
+        // Do this in the spark's firmware to set stuff like current and braking mode -^^^
+        elevatorPIDController = new PIDController(0.075, 0.001, 0.005);
+        elevatorPIDController.reset();
     }
 
     @Override
     public void periodic() {
         // Display current stage and encoder value on SmartDashboard
-        SmartDashboard.putNumber("Elevator Stage", elevatorStage);
-        SmartDashboard.putNumber("ElevatorMotor1 Encoder", getElevator1Encoder());
-        SmartDashboard.putNumber("ElevatorMotor2 Encoder", getElevator2Encoder());
-        SmartDashboard.putNumber("Claw Angle", getClawAngleEncoder());
-        SmartDashboard.putNumber("setpoint", getElevatorCurrentSetpoint());
+        SmartDashboard.putNumber("Elevator Encoder", GetCollectiveElevatorEncoder());
     }
 
-    /**
-     * Increment the elevator stage. Wraps around to 1 if it exceeds 4.
-     */
-    public void increaseStage() {
-
-            elevatorStage++;
-            if (elevatorStage > 4) {
-                elevatorStage = 1; // Loop back to stage 1
-            } 
+    /** Toggles game piece mode starting from Coral. */
+    public void SwapLocalGamePiece() {
+        isGamePieceCoral = !isGamePieceCoral;
     }
 
-    
-    public double getClawAngleCurrentSetpoint() {
-        // Update flipper motor based on stage
-       return ClawAngleSetpoints[elevatorStage - 1];
+    public boolean ElevatorInMotion() {
+        if (Math.abs(elevatorRunSpeed) < 0.2) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
-    /**
-     * Get the current setpoint based on the elevator stage.
-     * 
-     * @return Setpoint for the current stage.
-     */
-    public double getElevatorCurrentSetpoint() {
-        return elevatorsetpoints[elevatorStage - 1]; // Index setpoints array
-    }
-
-    /**
-     * Get the current encoder position.
-     * 
-     * @return The encoder position from the motor.
-     */
-    public double getElevator1Encoder() {
+    public double GetElevator1Encoder() {
         return elevatorMotor1.getEncoder().getPosition();
     }
-
-    public double getElevator2Encoder() {
+    public double GetElevator2Encoder() {
         return elevatorMotor2.getEncoder().getPosition();
     }
-
-    public double getClawAngleEncoder() {
-        return ClawAngleMotor.getEncoder().getPosition();
-    }
-    /**
-     * Set the motor speed.
-     * 
-     * @param speed The speed to set the motor (-1.0 to 1.0).
-     */
-    public void setElevatorMotor(double speed) {
-        elevatorMotor1.set(speed);
-        elevatorMotor2.set(-speed);
-
+    /** Returns average elevator encoder readings. */
+    public double GetCollectiveElevatorEncoder() {
+        return (-GetElevator1Encoder() + GetElevator2Encoder()) / 2;
     }
 
-    public void setClawAngleMotor(double speed) {
-        ClawAngleMotor.set(speed);
+    /** Set Elevator target position. */
+    public void SetElevatorTargetPosition(double position) {
+        elevatorPIDController.setSetpoint(position);
     }
 
-    /**
-     * Stop the Elevator and Claw motor.
-     */
-    public void stopMotor() {
+    /** Runs Elevator PID controller and sets speed. */
+    public void RunElevatorPID() {
+        double ElevatorcurrentPosition = GetCollectiveElevatorEncoder();
+        double ElevatorSpeed = elevatorPIDController.calculate(ElevatorcurrentPosition);
+        SetElevatorMotors(ElevatorSpeed);
+        elevatorRunSpeed = ElevatorSpeed;
+        if (ElevatorSpeed > -0.7) {
+            SetElevatorMotors(ElevatorSpeed);
+        } else {
+            SetElevatorMotors(-0.7);
+        }
+    }
+
+    /** Set Elevator motor speed. */
+    public void SetElevatorMotors(double speed) {
+        elevatorMotor1.set(-speed);
+        elevatorMotor2.set(speed);
+        SmartDashboard.putNumber("elevator speed", speed);
+
+    }
+
+    /** Stop the Elevator and Claw motor. */
+    public void StopMotors() {
         elevatorMotor1.set(0);
-        ClawAngleMotor.set(0);
+        elevatorMotor2.set(0);
     }
 
 

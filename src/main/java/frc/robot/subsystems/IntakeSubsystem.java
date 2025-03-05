@@ -2,8 +2,6 @@ package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -12,19 +10,38 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private final SparkMax IntakeMotor = new SparkMax(8, MotorType.kBrushless);
     private final DigitalInput CoralSensor = new DigitalInput(0);
-
     
-
+    private boolean isGamePieceCoral = true; // true for coral, false for algae
+    private double intakeSpeedCoral = -0.4;
+    private double intakeSpeedAlgae = 0.4;
     public IntakeSubsystem() {
         // Initialize motor if needed, like setting idle mode
     }
 
-    // Always run intake motor to collect coral until coral is detected
-    public void collectCoral() {
-        if (!CoralSensor.get()) {
-            IntakeMotor.set(-0.08889);
+    /** Toggles game piece mode starting from Coral. */
+    public void SwapLocalGamePiece() {
+        isGamePieceCoral = !isGamePieceCoral;
+    }
+   
+    /** Updates intake status depending on mode set with SwapGamePiece(). */
+    public void UpdateIntakeInput() {
+        if (isGamePieceCoral == true) {
+            if (CoralSensor.get()) {
+                IntakeMotor.set(0.0);
+            } else {
+                IntakeMotor.set(intakeSpeedCoral);
+            }
         } else {
-            stopIntake();
+            IntakeMotor.set(intakeSpeedAlgae);
+        }
+    }
+
+    /** Outtakes target gamepiece set with SwapGamePiece(). */
+    public void UpdateIntakeOutput() {
+        if (isGamePieceCoral == true) {
+            IntakeMotor.set(intakeSpeedCoral);
+        } else {
+            IntakeMotor.set(-intakeSpeedAlgae);
         }
     }
 
@@ -34,19 +51,9 @@ public class IntakeSubsystem extends SubsystemBase {
   
     }
 
-    // Run intake motor backward to collect algae / outtake coral
-    public void collectAlgaeOrOuttakeCoral() {
-        IntakeMotor.set(-0.08889);
-    }
-
-    // Run intake motor forward to outtake algae
-    public void outtakeAlgae() {
-        IntakeMotor.set(0.08889);
-    }
-
-    // Stop intake motor
-    public void stopIntake() {
-        IntakeMotor.set(0.0);
+    /** Stops intake motors. */
+    public void StopMotors() {
+        IntakeMotor.set(0);
     }
 
 }

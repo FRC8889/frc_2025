@@ -8,19 +8,17 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.AnalogInput;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
-
-import com.ctre.phoenix6.hardware.TalonFX;
 
 public class SwerveModule {
     private final TalonFX driveMotor;
     private final SparkMax turningMotor;
 
-    private final Double driveEncoder;
-    private final Double turningEncoder;
+    private Double driveEncoder;
+    private Double turningEncoder;
 
     private final PIDController turningPidController;
 
@@ -40,45 +38,50 @@ public class SwerveModule {
         driveEncoder = driveMotor.getPosition().getValueAsDouble();
         turningEncoder = turningMotor.getEncoder().getPosition();
 
-        turningPidController = new PIDController(ModuleConstants.kPTurning, 0.001, 0.0075);        
+        turningPidController = new PIDController(0.5, 0.001, 0.0075);        
         turningPidController.enableContinuousInput(-Math.PI, Math.PI);
 
         resetEncoders();
         
     }
 
+    /** Returns drive motor encoder position in meters. */
     public double getDrivePosition() {
-        return driveMotor.getPosition().getValueAsDouble() * ModuleConstants.kDriveEncoderRot2Meter;
+        return driveEncoder * ModuleConstants.kDriveEncoderRot2Meter;
     }
 
+    /** Returns turning motor encoder position in radians. */
     public double getTurningPosition() {
-        return turningMotor.getEncoder().getPosition() * ModuleConstants.kTurningEncoderRot2Rad;
+        return turningEncoder * ModuleConstants.kTurningEncoderRot2Rad;
     }
 
+    /** Returns drive motor velocity in meters per second. */
     public double getDriveVelocity() {
         return driveMotor.getVelocity().getValueAsDouble() * ModuleConstants.kDriveEncoderRPM2MeterPerSec;
     }
     
+    /** Returns turning motor velocity in radians per second. */
     public double getTurningVelocity() {
         return turningMotor.getEncoder().getVelocity() * ModuleConstants.kTurningEncoderRpm2RadPerSec;
     }
 
+    /** Returns adjusted absolute encoder position in radians. */
     public double getAbsoluteEncoderRad() {
-        //temporary until we have cancoders
-        return cancoder.getAbsolutePosition().getValueAsDouble() * ModuleConstants.kCANcoderRot2Rad;
+        return absoluteEncoderOffsetRad + (cancoder.getAbsolutePosition().getValueAsDouble() * -absoluteEncoderReversed * ModuleConstants.kCANcoderRot2Rad);
     }
 
+    /** Resets motor encoders and calibrates steering motor encoder with absolute encoder. */
     public void resetEncoders() {
         driveMotor.setPosition(0);
-        //Convert the thing from rads to rotations before you set it because talons are dumb
-        //Would be "getAbsoluteEncoderRad() / 6.283185" instead of 0 with cancoders
-        turningMotor.getEncoder().setPosition(getAbsoluteEncoderRad() / ModuleConstants.kCANcoderRot2Rad);
+        turningMotor.getEncoder().setPosition(21.428 * getAbsoluteEncoderRad() / ModuleConstants.kCANcoderRot2Rad);
     }
 
+    /** Returns current module state. */
     public SwerveModuleState getState() {
         return new SwerveModuleState(getDriveVelocity(), new Rotation2d(getTurningPosition()));
     }
 
+    /** Sets desired module state. */
     public void setDesiredState(SwerveModuleState state) {
         if (Math.abs(state.speedMetersPerSecond) < 0.001) {
             stop();
@@ -90,6 +93,12 @@ public class SwerveModule {
         SmartDashboard.putString("Swerve[" + cancoder.getDeviceID() + "] state", state.toString() + getAbsoluteEncoderRad());
     }
 
+    public void PrintCancoderValue() {
+        SmartDashboard.putNumber("Cancoder[" + cancoder.getDeviceID() + "] radians", getAbsoluteEncoderRad());
+    }
+
+
+    /** Stops drive and turning motors. */
     public void stop() {
         driveMotor.set(0);
         turningMotor.set(0);
