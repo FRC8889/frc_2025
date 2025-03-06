@@ -25,6 +25,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorPIDController.reset();
     }
 
+    public void ResetPid() {
+        elevatorPIDController.reset();
+    }
+
     @Override
     public void periodic() {
         // Display current stage and encoder value on SmartDashboard

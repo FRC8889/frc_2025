@@ -87,7 +87,13 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        modulePositions[0] = frontLeft.getPosition();
+        modulePositions[1] = frontRight.getPosition();
+        modulePositions[2] = backLeft.getPosition();
+        modulePositions[3] = backRight.getPosition();
+
         odometer.update(getRotation2d(), modulePositions);
+        
         SmartDashboard.putNumber("Robot Heading", getHeading());
         SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
         frontLeft.PrintCancoderValue();

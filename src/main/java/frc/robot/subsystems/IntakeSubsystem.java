@@ -12,8 +12,11 @@ public class IntakeSubsystem extends SubsystemBase {
     private final DigitalInput CoralSensor = new DigitalInput(0);
     
     private boolean isGamePieceCoral = true; // true for coral, false for algae
-    private double intakeSpeedCoral = -0.4;
-    private double intakeSpeedAlgae = 0.4;
+    private double intakeSpeedCoral = 0.3;
+    private double outtakeSpeedCoral = -1;   
+    private double intakeSpeedAlgae = 0.65;
+    private double outtakeSpeedAlgae = -1;
+
     public IntakeSubsystem() {
         // Initialize motor if needed, like setting idle mode
     }
@@ -29,7 +32,7 @@ public class IntakeSubsystem extends SubsystemBase {
             if (CoralSensor.get()) {
                 IntakeMotor.set(0.0);
             } else {
-                IntakeMotor.set(intakeSpeedCoral);
+                IntakeMotor.set(-intakeSpeedCoral);
             }
         } else {
             IntakeMotor.set(intakeSpeedAlgae);
@@ -39,9 +42,9 @@ public class IntakeSubsystem extends SubsystemBase {
     /** Outtakes target gamepiece set with SwapGamePiece(). */
     public void UpdateIntakeOutput() {
         if (isGamePieceCoral == true) {
-            IntakeMotor.set(intakeSpeedCoral);
+            IntakeMotor.set(outtakeSpeedCoral);
         } else {
-            IntakeMotor.set(-intakeSpeedAlgae);
+            IntakeMotor.set(outtakeSpeedAlgae);
         }
     }
 

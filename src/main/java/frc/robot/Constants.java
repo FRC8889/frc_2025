@@ -76,14 +76,14 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static final double kMaxSpeedMetersPerSecond = 1;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 1;
+        public static final double kMaxSpeedMetersPerSecond = .25;
+        public static final double kMaxAccelerationMetersPerSecondSquared = 5;
 
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
             OperatorConstants.kMaxAngularSpeedRadiansPerSecond, OperatorConstants.kMaxAngularAcceleration);
-        public static final double kPXController = 0.01;
-        public static final double kPYController = 0.01;
-        public static final double kPThetaController = 0.01;
+        public static final double kPXController = 0.1;
+        public static final double kPYController = 0.1;
+        public static final double kPThetaController = 1;
 
     }
 
@@ -105,7 +105,7 @@ public final class Constants {
         
 
         public static final double kClawPositionFallback = 1.9;
-        public static final double kClawPositionIntake = 0.2;
+        public static final double kClawPositionIntake = 0.75;
         public static final double kClawPositionL1 = 0.5;
         public static final double kClawPositionL2 = 3.5;
         public static final double kClawPositionL3 = 3.5;

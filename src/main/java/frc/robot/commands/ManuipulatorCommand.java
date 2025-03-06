@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 public class ManuipulatorCommand extends Command {
-    private final Joystick driverJoystick = new Joystick(OperatorConstants.kDriverControllerPort);
+    private final Joystick operatorJoystick = new Joystick(1);
     private boolean CycleStageTogglePressed = false;
     private boolean ClawPositionTogglePressed = false;
     private boolean GamePieceTogglePressed = false;
@@ -38,6 +38,10 @@ public class ManuipulatorCommand extends Command {
     @Override
     public void initialize() {
         System.out.println("ManipulatorCommand initialized");
+        algaeLevel = 0;
+        coralLevel = 0;
+        isClawOut = false;
+        isGamePieceCoral = true;
     }
 
     @Override
@@ -55,7 +59,7 @@ public class ManuipulatorCommand extends Command {
 
 
         // Run Intake/Outtake always depending on press
-        JoystickButton OuttakeButton = new JoystickButton(driverJoystick, 4);
+        JoystickButton OuttakeButton = new JoystickButton(operatorJoystick, 4);
         if (OuttakeButton.getAsBoolean()) {
             OuttakeGamepiece();
         } else{
@@ -63,7 +67,7 @@ public class ManuipulatorCommand extends Command {
         }
 
         // Run CycleStage ONCE per click
-        JoystickButton CycleStage = new JoystickButton(driverJoystick, 1);
+        JoystickButton CycleStage = new JoystickButton(operatorJoystick, 1);
         if (CycleStage.getAsBoolean()) {
             if (!CycleStageTogglePressed) {
                 CycleStage();
@@ -74,7 +78,7 @@ public class ManuipulatorCommand extends Command {
         }
 
         // Run ClawToggle ONCE per click
-        JoystickButton ClawPosition = new JoystickButton(driverJoystick, 3);
+        JoystickButton ClawPosition = new JoystickButton(operatorJoystick, 3);
         if (ClawPosition.getAsBoolean()) {
             if (!ClawPositionTogglePressed) {
                 ToggleClawPosition();
@@ -85,7 +89,7 @@ public class ManuipulatorCommand extends Command {
         }
 
         // run SwapGamePiece ONCE per click
-        JoystickButton GamePiece = new JoystickButton(driverJoystick, 2);
+        JoystickButton GamePiece = new JoystickButton(operatorJoystick, 2);
         if(GamePiece.getAsBoolean()) {
             if (!GamePieceTogglePressed) {
                 SwapGamePiece();
