@@ -9,11 +9,11 @@ import edu.wpi.first.wpilibj.DigitalInput;
 public class IntakeSubsystem extends SubsystemBase {
 
     private final SparkMax IntakeMotor = new SparkMax(8, MotorType.kBrushless);
-    private final DigitalInput CoralSensor = new DigitalInput(0);
+    public final DigitalInput CoralSensor = new DigitalInput(0);
     
     private boolean isGamePieceCoral = true; // true for coral, false for algae
     private double intakeSpeedCoral = 0.3;
-    private double outtakeSpeedCoral = -1;   
+    private double outtakeSpeedCoral = -0.5;   
     private double intakeSpeedAlgae = 0.65;
     private double outtakeSpeedAlgae = -1;
 

@@ -40,6 +40,7 @@ public class RobotContainer {
     private final ClawSubsystem clawSubsystem = new ClawSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final Joystick driverJoystick = new Joystick(OperatorConstants.kDriverControllerPort);
+    private final ManuipulatorCommand manipulatorCommand = new ManuipulatorCommand(elevatorSubsystem, clawSubsystem, intakeSubsystem);
 
     public RobotContainer() {
         swerveSubsystem.setDefaultCommand(new SwerveJoystickCmd(
@@ -72,11 +73,10 @@ public class RobotContainer {
 
         // 2. Generate trajectory
         Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
-            new Pose2d(0, 0, new Rotation2d(0)),
+            new Pose2d(0, 0, new Rotation2d(0).fromDegrees(0)),
             List.of(
-                new Translation2d(2.1, 0),
-                new Translation2d(2.1, 2.0)),
-                new Pose2d(2.1, 2.94, new Rotation2d(Math.PI/2)),
+                new Translation2d(0, -0.75)),
+                new Pose2d(.1,-0.8, new Rotation2d().fromDegrees(0)),
             trajectoryConfig );
         
         // 3. Define PID controllers for tracking trajectory
@@ -91,10 +91,10 @@ public class RobotContainer {
         // 5. Add some "wtf is this guy saying" and return everything
         return new SequentialCommandGroup(
             new InstantCommand(() -> swerveSubsystem.resetOdometry(trajectory.getInitialPose())),
-            new InstantCommand(() -> clawSubsystem.Tracking()),
             swerveControllerCommand,
             new InstantCommand(() -> swerveSubsystem.stopModules()),
-            new InstantCommand(() -> clawSubsystem.Tracking())
+            new RunCommand(() -> manipulatorCommand.OuttakeGamepiece()),
+            new InstantCommand(() -> manipulatorCommand.StopMotors())
         );
         
 

@@ -7,6 +7,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.ClawSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import pabeles.concurrency.ConcurrencyOps.Reset;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -15,8 +16,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ManuipulatorCommand extends Command {
     private final Joystick operatorJoystick = new Joystick(1);
-    private boolean CycleStageTogglePressed = false;
-    private boolean ClawPositionTogglePressed = false;
+    private boolean StageUp = false;
+    private boolean StageDown = false;
     private boolean GamePieceTogglePressed = false;
 
     private final ElevatorSubsystem elevatorSubsystem;
@@ -42,62 +43,71 @@ public class ManuipulatorCommand extends Command {
         coralLevel = 0;
         isClawOut = false;
         isGamePieceCoral = true;
+        ResetEncoders();
     }
 
     @Override
     public void execute() {
         // Run the stuffs to make it move
-        UpdateElevatorPositionIfSafe();
         UpdateClawPosition();
         clawSubsystem.RunClawPID();
+        UpdateElevatorPositionIfSafe();
         elevatorSubsystem.RunElevatorPID();
-        intakeSubsystem.UpdateIntakeInput();
 
-        SmartDashboard.putNumber("Coral Level, Algae Level", coralLevel + algaeLevel);
+        SmartDashboard.putNumber("Elevator level", coralLevel + algaeLevel);
         SmartDashboard.putBoolean("Claw Position", isClawOut);
         SmartDashboard.putBoolean("Piece Type", isGamePieceCoral);
 
-
-        // Run Intake/Outtake always depending on press
-        JoystickButton OuttakeButton = new JoystickButton(operatorJoystick, 4);
-        if (OuttakeButton.getAsBoolean()) {
-            OuttakeGamepiece();
-        } else{
-            IntakeGamepiece();
-        }
-
-        // Run CycleStage ONCE per click
-        JoystickButton CycleStage = new JoystickButton(operatorJoystick, 1);
-        if (CycleStage.getAsBoolean()) {
-            if (!CycleStageTogglePressed) {
-                CycleStage();
-                CycleStageTogglePressed = true;
+        // IGNORE controls unless teleop
+        if (DriverStation.isTeleop()) {
+            // Run Intake/Outtake always depending on press
+            JoystickButton OuttakeButton = new JoystickButton(operatorJoystick, 1);
+            if (OuttakeButton.getAsBoolean()) {
+                OuttakeGamepiece();
+            } else{
+                IntakeGamepiece();
             }
-        } else {
-            CycleStageTogglePressed = false;
-        }
 
-        // Run ClawToggle ONCE per click
-        JoystickButton ClawPosition = new JoystickButton(operatorJoystick, 3);
-        if (ClawPosition.getAsBoolean()) {
-            if (!ClawPositionTogglePressed) {
-                ToggleClawPosition();
-                ClawPositionTogglePressed = true;
+            // Run Stage Cycles ONCE per click
+            if (operatorJoystick.getRawAxis(3) > 0.25) {
+                if (!StageUp) {
+                    StageUp();
+                    StageUp = true;
+                }
+            } else {
+                StageUp = false;
             }
-        } else {
-            ClawPositionTogglePressed = false;
-        }
 
-        // run SwapGamePiece ONCE per click
-        JoystickButton GamePiece = new JoystickButton(operatorJoystick, 2);
-        if(GamePiece.getAsBoolean()) {
-            if (!GamePieceTogglePressed) {
-                SwapGamePiece();
-                GamePieceTogglePressed = true;
+            if ((operatorJoystick.getRawAxis(2) > 0.25)) {
+                if (!StageDown) {
+                    StageDown();
+                    StageDown = true;
+                }
+            } else {
+                StageDown = false;
             }
-        } else {
-            GamePieceTogglePressed = false;
+
+            JoystickButton ResetManuipulator = new JoystickButton(operatorJoystick, 2);
+            if (ResetManuipulator.getAsBoolean()) {
+                ResetStage();
+            }
+
+            // run SwapGamePiece ONCE per click
+            JoystickButton GamePiece = new JoystickButton(operatorJoystick, 3);
+            if(GamePiece.getAsBoolean()) {
+                if (!GamePieceTogglePressed) {
+                    SwapGamePiece();
+                    GamePieceTogglePressed = true;
+                }
+            } else {
+                GamePieceTogglePressed = false;
+            }
         }
+    }
+
+    public void ResetEncoders() {
+        elevatorSubsystem.ResetEncoders();
+        clawSubsystem.ResetEncoders();
     }
        
     
@@ -109,6 +119,9 @@ public class ManuipulatorCommand extends Command {
 
     public void OuttakeGamepiece() {
         intakeSubsystem.UpdateIntakeOutput();
+        if (!intakeSubsystem.CoralSensor.get()) {
+            return;
+        }
     }
 
     public void ResetStage() {
@@ -117,19 +130,38 @@ public class ManuipulatorCommand extends Command {
         } else {
             algaeLevel = 0;
         }
-        ResetClawPosition();
     }
 
-    public void CycleStage() {
+    public void StageUp() {
         if (isGamePieceCoral) {
             coralLevel++;
             if (coralLevel > 4) {
-                ResetStage();
+                coralLevel = 4;
+                return;
             }
         } else {
             algaeLevel++;
-            if (algaeLevel > 2) {
-                ResetStage();
+            if (algaeLevel > 3) {
+                algaeLevel = 3;
+                return;
+            }
+        }
+        ResetClawPosition();
+        return;
+    }
+
+    public void StageDown() {
+        if (isGamePieceCoral) {
+            coralLevel--;
+            if (coralLevel < 0) {
+                coralLevel = 0;
+                return;
+            }
+        } else {
+            algaeLevel--;
+            if (algaeLevel < 0) {
+                algaeLevel = 0;
+                return;
             }
         }
         ResetClawPosition();
@@ -140,21 +172,18 @@ public class ManuipulatorCommand extends Command {
         isClawOut = false;
     }
 
-    public void ToggleClawPosition() {
-        isClawOut = !isClawOut;
-        return;
-    }
-
+    
     public void SwapGamePiece() {
-        if (isGamePieceCoral) {
-            algaeLevel = 0;
-        } else {
-            coralLevel = 0;
-        }
         SwapLocalGamePiece();
         elevatorSubsystem.SwapLocalGamePiece();
         clawSubsystem.SwapLocalGamePiece();
         intakeSubsystem.SwapLocalGamePiece();
+        if (isGamePieceCoral) {
+            algaeLevel = 0;
+            UpdateElevatorPosition();
+        } else {
+            coralLevel = 0;
+        }
         return;
     }
     
@@ -164,16 +193,10 @@ public class ManuipulatorCommand extends Command {
 
 
     public void UpdateElevatorPositionIfSafe() {
-        if (clawSubsystem.GetClawEncoder() > ManipulatorConstants.kClawPositionSafe1Min && clawSubsystem.GetClawEncoder() < ManipulatorConstants.kClawPositionSafe1Max) {
-            if (clawSubsystem.GetClawEncoder() > ManipulatorConstants.kClawPositionSafe2Min && clawSubsystem.GetClawEncoder() < ManipulatorConstants.kClawPositionSafe2Max) {
-                UpdateElevatorPosition();
-            } else {
-                clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionFallback);
-                UpdateElevatorPosition();
-            }
-        } else { 
-            clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionFallback);
+        if (clawSubsystem.AtTarget() || !elevatorSubsystem.InMotion()) {
             UpdateElevatorPosition();
+        } else {
+            clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionFallback);
         }
     }
 
@@ -198,6 +221,8 @@ public class ManuipulatorCommand extends Command {
                     elevatorSubsystem.SetElevatorTargetPosition(ManipulatorConstants.kElevatorPositionAlgaeLow);
                 } else if (algaeLevel == 2) {
                     elevatorSubsystem.SetElevatorTargetPosition(ManipulatorConstants.kElevatorPositionAlgaeHigh);
+                }   else if (algaeLevel == 3) {
+                    elevatorSubsystem.SetElevatorTargetPosition(ManipulatorConstants.kElevatorPositionAlgaeBarge);
                 }
             }
         }
@@ -205,8 +230,8 @@ public class ManuipulatorCommand extends Command {
     }
 
     public void UpdateClawPosition() {
-        if (isGamePieceCoral) {
-            if (isClawOut && !elevatorSubsystem.ElevatorInMotion()) {
+        if (isGamePieceCoral && !elevatorSubsystem.InMotion() && elevatorSubsystem.AtTarget()) {
+            if (!elevatorSubsystem.InMotion()) {
                 if (coralLevel == 0) {
                     clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionIntake);
                 } else if (coralLevel == 1) {
@@ -218,23 +243,31 @@ public class ManuipulatorCommand extends Command {
                 } else if (coralLevel == 4) {
                     clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionL4);
                 }
-            } else if (coralLevel == 0 && !elevatorSubsystem.ElevatorInMotion()) {
+            } else if (coralLevel == 0) {
                 clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionIntake);
             } else {
                 clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionFallback);
             }
 
-        } else {
-            if (!isGamePieceCoral) {
-                if (algaeLevel == 0) {
-                    clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionAlgaeProcesser);
-                } else if (algaeLevel == 1) {
-                    clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionAlgaeLow);
-                } else if (algaeLevel == 2) {
-                    clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionAlgaeHigh);
-                }
+        } else if (!isGamePieceCoral) {
+            if (algaeLevel == 0) {
+                clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionAlgaeProcesser);
+            } else if (algaeLevel == 1) {
+                clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionAlgaeLow);
+            } else if (algaeLevel == 2) {
+                clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionAlgaeHigh);
+            } else if (algaeLevel == 3) {
+                clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionAlgaeBarge);
             }
-        } 
+        } else {
+            clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionFallback);
+        }
+    }
+
+    public void StopMotors() {
+        elevatorSubsystem.StopMotors();
+        clawSubsystem.StopMotors();
+        intakeSubsystem.StopMotors();
     }
 
     
@@ -249,7 +282,8 @@ public class ManuipulatorCommand extends Command {
     @Override
     public boolean isFinished() {
    // Only run in teleop; finish immediately otherwise.
-        return !DriverStation.isTeleop();   
+        //return !DriverStation.isTeleop();   
+        return false;
      }
 
     public static void setDefaultCommand(ManuipulatorCommand manuipulatorCommand) {

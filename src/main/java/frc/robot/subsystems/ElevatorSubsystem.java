@@ -25,6 +25,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorPIDController.reset();
     }
 
+    public void ResetEncoders() {
+        elevatorMotor1.getEncoder().setPosition(0);
+        elevatorMotor2.getEncoder().setPosition(0);
+        isGamePieceCoral = true;
+    }
+
     public void ResetPid() {
         elevatorPIDController.reset();
     }
@@ -33,6 +39,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void periodic() {
         // Display current stage and encoder value on SmartDashboard
         SmartDashboard.putNumber("Elevator Encoder", GetCollectiveElevatorEncoder());
+        SmartDashboard.putBoolean("Elevator In Motion", InMotion());
+
     }
 
     /** Toggles game piece mode starting from Coral. */
@@ -40,13 +48,21 @@ public class ElevatorSubsystem extends SubsystemBase {
         isGamePieceCoral = !isGamePieceCoral;
     }
 
-    public boolean ElevatorInMotion() {
-        if (Math.abs(elevatorRunSpeed) < 0.2) {
+    public boolean InMotion() {
+        if (Math.abs(elevatorRunSpeed) < 0.1) {
             return false;
         } else {
             return true;
         }
     }
+    
+    public boolean AtTarget() {
+        if (6 > Math.abs(elevatorPIDController.getSetpoint() - GetCollectiveElevatorEncoder())) {
+            return true;
+        } else {
+            return false;
+        }
+    }    
 
     public double GetElevator1Encoder() {
         return elevatorMotor1.getEncoder().getPosition();
@@ -90,8 +106,4 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorMotor1.set(0);
         elevatorMotor2.set(0);
     }
-
-
-
-
 }

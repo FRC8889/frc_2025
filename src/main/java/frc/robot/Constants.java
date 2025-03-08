@@ -76,13 +76,13 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static final double kMaxSpeedMetersPerSecond = .25;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 5;
+        public static final double kMaxSpeedMetersPerSecond = 1;
+        public static final double kMaxAccelerationMetersPerSecondSquared = 3;
 
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
             OperatorConstants.kMaxAngularSpeedRadiansPerSecond, OperatorConstants.kMaxAngularAcceleration);
-        public static final double kPXController = 0.1;
-        public static final double kPYController = 0.1;
+        public static final double kPXController = 0.2;
+        public static final double kPYController = 0.2;
         public static final double kPThetaController = 1;
 
     }
@@ -102,23 +102,27 @@ public final class Constants {
         public static final double kElevatorPositionAlgaeProcesser = 16;
         public static final double kElevatorPositionAlgaeLow = 36;
         public static final double kElevatorPositionAlgaeHigh = 65;
+        public static final double kElevatorPositionAlgaeBarge = 107;
+
         
 
-        public static final double kClawPositionFallback = 1.9;
+        public static final double kClawPositionFallback = 8;
         public static final double kClawPositionIntake = 0.75;
         public static final double kClawPositionL1 = 0.5;
         public static final double kClawPositionL2 = 3.5;
         public static final double kClawPositionL3 = 3.5;
-        public static final double kClawPositionL4 = 7;
+        public static final double kClawPositionL4 = 4;
         public static final double kClawPositionAlgaeProcesser = 15;
         public static final double kClawPositionAlgaeLow = 13;
         public static final double kClawPositionAlgaeHigh = 13;
+        public static final double kClawPositionAlgaeBarge = 4;
+
 
         // Claw safe values
-        public static final double kClawPositionSafe1Min = 1.5;
-        public static final double kClawPositionSafe1Max = 2;
-        public static final double kClawPositionSafe2Min = 5.5;
-        public static final double kClawPositionSafe2Max = 20.0;
+        //public static final double kClawPositionSafe1Min = 1.5;
+        //public static final double kClawPositionSafe1Max = 2;
+        //public static final double kClawPositionSafe2Min = 5.5;
+        //public static final double kClawPositionSafe2Max = 20.0;
 
     }
 

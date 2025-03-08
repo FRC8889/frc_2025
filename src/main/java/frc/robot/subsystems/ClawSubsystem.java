@@ -19,9 +19,14 @@ public class ClawSubsystem extends SubsystemBase {
     public ClawSubsystem() {
         // Initialize motors and pid for whatever (DO NOT SET THE MOTOR CONFIGS IN CODE OR YOU WILL BREAK THE ROBOT AGAIN BY ACCIDENT)
         // Do this in the spark's firmware to set stuff like current and braking mode -^^^
-        clawPIDController = new PIDController(0.075, 0.05, 0.005);
+        clawPIDController = new PIDController(0.04, 0.00025, 0.001);
         clawPIDController.reset();
+        
+    }
 
+    public void ResetEncoders() {
+        clawMotor.getEncoder().setPosition(0);
+        isGamePieceCoral = true;
     }
 
     public void ResetPid() {
@@ -37,6 +42,7 @@ public class ClawSubsystem extends SubsystemBase {
         // Display encoder value on SmartDashboard
         SmartDashboard.putNumber("Claw Encoder", GetClawEncoder());
         SmartDashboard.putNumber("tracking", tracking);
+        SmartDashboard.putBoolean("Claw at target?", AtTarget());
     }
     
     /** Returns claw encoder reading. */    
@@ -47,6 +53,14 @@ public class ClawSubsystem extends SubsystemBase {
     /** Set Claw target position. */
     public void SetClawTargetPosition(double position) {
         clawPIDController.setSetpoint(position);
+    }
+
+    public boolean AtTarget() {
+        if (0.75 > Math.abs(clawPIDController.getSetpoint() - GetClawEncoder())) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /** Runs Claw PID controller and sets speed. */
