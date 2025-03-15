@@ -75,6 +75,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         return (-GetElevator1Encoder() + GetElevator2Encoder()) / 2;
     }
 
+    public double GetCollectiveElevatorCurrent() {
+        return (elevatorMotor1.getOutputCurrent() + elevatorMotor2.getOutputCurrent()) / 2;
+    }
+
     /** Set Elevator target position. */
     public void SetElevatorTargetPosition(double position) {
         elevatorPIDController.setSetpoint(position);

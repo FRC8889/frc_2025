@@ -27,6 +27,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.SwerveJoystickCmd;
+import frc.robot.commands.AlignToReefCmd;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.ManuipulatorCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -41,6 +42,8 @@ public class RobotContainer {
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final Joystick driverJoystick = new Joystick(OperatorConstants.kDriverControllerPort);
     private final ManuipulatorCommand manipulatorCommand = new ManuipulatorCommand(elevatorSubsystem, clawSubsystem, intakeSubsystem);
+
+
 
     public RobotContainer() {
         swerveSubsystem.setDefaultCommand(new SwerveJoystickCmd(
@@ -58,7 +61,8 @@ public class RobotContainer {
     private void configureBindings() {
         new JoystickButton(driverJoystick, 5).whileTrue(new RunCommand(() -> swerveSubsystem.zeroHeading()));
         new JoystickButton(driverJoystick, 5).whileTrue(new RunCommand(() -> swerveSubsystem.resetEncoders()));
-        
+        new JoystickButton(driverJoystick, 1).whileTrue(new AlignToReefCmd(swerveSubsystem));
+
 
         //new JoystickButton(driverJoystick, 1).whileTrue(new InstantCommand(() -> elevatorSubsystem.increaseElevatorStage(), elevatorSubsystem));
         //new JoystickButton(driverJoystick, 5).whileTrue(new RunCommand(() -> intakeSubsystem.collectAlgaeOrOuttakeCoral(), intakeSubsystem));
@@ -75,8 +79,8 @@ public class RobotContainer {
         Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
             new Pose2d(0, 0, new Rotation2d(0).fromDegrees(0)),
             List.of(
-                new Translation2d(0, -0.75)),
-                new Pose2d(.1,-0.8, new Rotation2d().fromDegrees(0)),
+                new Translation2d(1.2, 0)),
+                new Pose2d(2.4,-0.1, new Rotation2d().fromDegrees(0)),
             trajectoryConfig );
         
         // 3. Define PID controllers for tracking trajectory

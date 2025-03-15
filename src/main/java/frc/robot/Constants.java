@@ -71,8 +71,8 @@ public final class Constants {
         
         public static final double kMaxDriveSpeedMetersPerSecond = 1.5;
         public static final double kMaxAngularSpeedRadiansPerSecond = 3;
-        public static final double kMaxDriveAcceleration = 2;
-        public static final double kMaxAngularAcceleration = 3.5;
+        public static final double kMaxDriveAcceleration = 3;
+        public static final double kMaxAngularAcceleration = 4.5;
     }
 
     public static final class AutoConstants {
@@ -97,24 +97,24 @@ public final class Constants {
         public static final double kElevatorPositionIntake = 0.5;
         public static final double kElevatorPositionL1 = 3;
         public static final double kElevatorPositionL2 = 18;
-        public static final double kElevatorPositionL3 = 46;
+        public static final double kElevatorPositionL3 = 45.25;
         public static final double kElevatorPositionL4 = 107;
         public static final double kElevatorPositionAlgaeProcesser = 16;
         public static final double kElevatorPositionAlgaeLow = 36;
         public static final double kElevatorPositionAlgaeHigh = 65;
-        public static final double kElevatorPositionAlgaeBarge = 107;
+        public static final double kElevatorPositionAlgaeBarge = 103;
 
         
 
         public static final double kClawPositionFallback = 8;
         public static final double kClawPositionIntake = 0.75;
         public static final double kClawPositionL1 = 0.5;
-        public static final double kClawPositionL2 = 3.5;
-        public static final double kClawPositionL3 = 3.5;
+        public static final double kClawPositionL2 = 2.75;
+        public static final double kClawPositionL3 = 2.75;
         public static final double kClawPositionL4 = 4;
         public static final double kClawPositionAlgaeProcesser = 15;
-        public static final double kClawPositionAlgaeLow = 13;
-        public static final double kClawPositionAlgaeHigh = 13;
+        public static final double kClawPositionAlgaeLow = 11;
+        public static final double kClawPositionAlgaeHigh = 11;
         public static final double kClawPositionAlgaeBarge = 4;
 
 

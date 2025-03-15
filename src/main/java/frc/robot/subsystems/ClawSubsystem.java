@@ -29,6 +29,11 @@ public class ClawSubsystem extends SubsystemBase {
         isGamePieceCoral = true;
     }
 
+    public void ForceResetEncoders() {
+        clawMotor.set(-0.5);
+        clawMotor.getEncoder().setPosition(0);
+    }
+
     public void ResetPid() {
         clawPIDController.reset();
     }

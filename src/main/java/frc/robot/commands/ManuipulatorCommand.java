@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ManuipulatorCommand extends Command {
     private final Joystick operatorJoystick = new Joystick(1);
+    private final Joystick driverJoystick = new Joystick(0);
     private boolean StageUp = false;
     private boolean StageDown = false;
     private boolean GamePieceTogglePressed = false;
@@ -50,7 +51,6 @@ public class ManuipulatorCommand extends Command {
     public void execute() {
         // Run the stuffs to make it move
         UpdateClawPosition();
-        clawSubsystem.RunClawPID();
         UpdateElevatorPositionIfSafe();
         elevatorSubsystem.RunElevatorPID();
 
@@ -68,8 +68,16 @@ public class ManuipulatorCommand extends Command {
                 IntakeGamepiece();
             }
 
+            //Either do this or update the pid like normal
+            JoystickButton ForceResetClawButton = new JoystickButton(driverJoystick, 6);
+            if (ForceResetClawButton.getAsBoolean()) {
+                clawSubsystem.ForceResetEncoders();
+            } else {
+                clawSubsystem.RunClawPID();
+            }
+
             // Run Stage Cycles ONCE per click
-            if (operatorJoystick.getRawAxis(3) > 0.25) {
+            if (operatorJoystick.getRawAxis(3) > 0.15) {
                 if (!StageUp) {
                     StageUp();
                     StageUp = true;
@@ -78,7 +86,7 @@ public class ManuipulatorCommand extends Command {
                 StageUp = false;
             }
 
-            if ((operatorJoystick.getRawAxis(2) > 0.25)) {
+            if ((operatorJoystick.getRawAxis(2) > 0.15)) {
                 if (!StageDown) {
                     StageDown();
                     StageDown = true;
@@ -245,7 +253,7 @@ public class ManuipulatorCommand extends Command {
                 }
             } else if (coralLevel == 0) {
                 clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionIntake);
-            } else {
+            } else { 
                 clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionFallback);
             }
 

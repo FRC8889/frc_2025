@@ -5,6 +5,7 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 
 public class IntakeSubsystem extends SubsystemBase {
 
@@ -15,7 +16,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private double intakeSpeedCoral = 0.3;
     private double outtakeSpeedCoral = -0.5;   
     private double intakeSpeedAlgae = 0.65;
-    private double outtakeSpeedAlgae = -1;
+    private double outtakeSpeedAlgae = -0.75;
 
     public IntakeSubsystem() {
         // Initialize motor if needed, like setting idle mode
@@ -42,10 +43,22 @@ public class IntakeSubsystem extends SubsystemBase {
     /** Outtakes target gamepiece set with SwapGamePiece(). */
     public void UpdateIntakeOutput() {
         if (isGamePieceCoral == true) {
-            IntakeMotor.set(outtakeSpeedCoral);
+            if (DriverStation.isAutonomous()) {
+            IntakeMotor.set(outtakeSpeedCoral * 1.5);
+            } else {
+                IntakeMotor.set(outtakeSpeedCoral);
+            }
         } else {
             IntakeMotor.set(outtakeSpeedAlgae);
         }
+    }
+
+    public boolean IsHoldingGamepiece() {
+        if (CoralSensor.get() || IntakeMotor.getOutputCurrent() > 20) {
+            return true;
+        } else {
+            return false;
+        }     
     }
 
     @Override
