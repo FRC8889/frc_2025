@@ -12,16 +12,15 @@ import frc.robot.subsystems.SwerveSubsystem;
 public class AlignToReefCmd extends Command {
   private PIDController xController, yController, rotController;
   private SwerveSubsystem swerveSubsystem;
+  boolean atTarget = false;
 
   public AlignToReefCmd(SwerveSubsystem swerveSubsystem) {
     xController = new PIDController(1, 0.0, 0);  // Vertical movement
     yController = new PIDController(1.5, 0.0, 0);  // Horitontal movement
     rotController = new PIDController(0.06, 0, 0);  // Rotation
-    xController.setTolerance(1);
-    yController.setTolerance(1);
-    rotController.setTolerance(1);
     this.swerveSubsystem = swerveSubsystem;
     addRequirements(swerveSubsystem);
+
   }
 
   @Override
@@ -29,24 +28,24 @@ public class AlignToReefCmd extends Command {
     xController.reset();
     yController.reset();
     rotController.reset();
+    atTarget = false;
   }
 
   @Override
   public void execute() {
     if (LimelightHelpers.getTV("")) {
-
       double[] postions = LimelightHelpers.getBotPose_TargetSpace("");
       SmartDashboard.putNumber("x", postions[2]);
 
-      double xSpeed = xController.calculate(postions[2] + 1);
+      double xSpeed = xController.calculate(postions[2] + 0.65);
       SmartDashboard.putNumber("xspeed", xSpeed);
-      double ySpeed = yController.calculate(postions[0]);
+      double ySpeed = yController.calculate(postions[0]); //coral offset 0.21
       double rotValue = rotController.calculate(postions[4]);
-      if (!xController.atSetpoint() && !yController.atSetpoint() && !rotController.atSetpoint()) {
-        swerveSubsystem.drive(xSpeed, ySpeed, rotValue);
-      } else {
-        swerveSubsystem.drive(0, 0, 0);
+      swerveSubsystem.drive(xSpeed, ySpeed, rotValue);
+      if (xController.getError() < .2 && yController.getError() < .2 && rotController.getError() < 3) {
+        atTarget = true;
       }
+
     }
   }
 
@@ -57,6 +56,6 @@ public class AlignToReefCmd extends Command {
 
   @Override
   public boolean isFinished() {
-    return false;
+    return atTarget;
   }
 }

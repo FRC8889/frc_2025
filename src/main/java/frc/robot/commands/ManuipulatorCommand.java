@@ -69,7 +69,7 @@ public class ManuipulatorCommand extends Command {
             }
 
             //Either do this or update the pid like normal
-            JoystickButton ForceResetClawButton = new JoystickButton(driverJoystick, 6);
+            JoystickButton ForceResetClawButton = new JoystickButton(driverJoystick, 2);
             if (ForceResetClawButton.getAsBoolean()) {
                 clawSubsystem.ForceResetEncoders();
             } else {

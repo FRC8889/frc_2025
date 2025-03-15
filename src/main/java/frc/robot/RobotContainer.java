@@ -80,7 +80,7 @@ public class RobotContainer {
             new Pose2d(0, 0, new Rotation2d(0).fromDegrees(0)),
             List.of(
                 new Translation2d(1.2, 0)),
-                new Pose2d(2.4,-0.1, new Rotation2d().fromDegrees(0)),
+                new Pose2d(2.4,-0.1, new Rotation2d().fromDegrees(-115)),
             trajectoryConfig );
         
         // 3. Define PID controllers for tracking trajectory
@@ -96,9 +96,8 @@ public class RobotContainer {
         return new SequentialCommandGroup(
             new InstantCommand(() -> swerveSubsystem.resetOdometry(trajectory.getInitialPose())),
             swerveControllerCommand,
-            new InstantCommand(() -> swerveSubsystem.stopModules()),
-            new RunCommand(() -> manipulatorCommand.OuttakeGamepiece()),
-            new InstantCommand(() -> manipulatorCommand.StopMotors())
+            new AlignToReefCmd(swerveSubsystem),
+            new InstantCommand(() -> swerveSubsystem.stopModules())
         );
         
 

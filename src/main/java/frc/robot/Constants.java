@@ -69,15 +69,15 @@ public final class Constants {
         
         public static final double kDeadband = 0.08;
         
-        public static final double kMaxDriveSpeedMetersPerSecond = 1.5;
-        public static final double kMaxAngularSpeedRadiansPerSecond = 3;
-        public static final double kMaxDriveAcceleration = 3;
-        public static final double kMaxAngularAcceleration = 4.5;
+        public static final double kMaxDriveSpeedMetersPerSecond = 2.5; //2.5
+        public static final double kMaxAngularSpeedRadiansPerSecond = 6; //6
+        public static final double kMaxDriveAcceleration = 3; //3
+        public static final double kMaxAngularAcceleration = 5.5; //5.5
     }
 
     public static final class AutoConstants {
         public static final double kMaxSpeedMetersPerSecond = 1;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+        public static final double kMaxAccelerationMetersPerSecondSquared = 2; //3
 
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
             OperatorConstants.kMaxAngularSpeedRadiansPerSecond, OperatorConstants.kMaxAngularAcceleration);
@@ -98,11 +98,11 @@ public final class Constants {
         public static final double kElevatorPositionL1 = 3;
         public static final double kElevatorPositionL2 = 18;
         public static final double kElevatorPositionL3 = 45.25;
-        public static final double kElevatorPositionL4 = 107;
+        public static final double kElevatorPositionL4 = 97;
         public static final double kElevatorPositionAlgaeProcesser = 16;
-        public static final double kElevatorPositionAlgaeLow = 36;
-        public static final double kElevatorPositionAlgaeHigh = 65;
-        public static final double kElevatorPositionAlgaeBarge = 103;
+        public static final double kElevatorPositionAlgaeLow = 33;
+        public static final double kElevatorPositionAlgaeHigh = 62;
+        public static final double kElevatorPositionAlgaeBarge = 107;
 
         
 
