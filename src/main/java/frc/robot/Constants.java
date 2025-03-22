@@ -75,18 +75,7 @@ public final class Constants {
         public static final double kMaxAngularAcceleration = 5.5; //5.5
     }
 
-    public static final class AutoConstants {
-        public static final double kMaxSpeedMetersPerSecond = 1;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 2; //3
-
-        public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
-            OperatorConstants.kMaxAngularSpeedRadiansPerSecond, OperatorConstants.kMaxAngularAcceleration);
-        public static final double kPXController = 0.2;
-        public static final double kPYController = 0.2;
-        public static final double kPThetaController = 1;
-
-    }
-
+   
     public static final class ManipulatorConstants {
 
         public static final int kElevatorMotor1ID = 5;
@@ -98,7 +87,7 @@ public final class Constants {
         public static final double kElevatorPositionL1 = 3;
         public static final double kElevatorPositionL2 = 18;
         public static final double kElevatorPositionL3 = 45.25;
-        public static final double kElevatorPositionL4 = 97;
+        public static final double kElevatorPositionL4 = 95;
         public static final double kElevatorPositionAlgaeProcesser = 16;
         public static final double kElevatorPositionAlgaeLow = 33;
         public static final double kElevatorPositionAlgaeHigh = 62;
@@ -107,11 +96,11 @@ public final class Constants {
         
 
         public static final double kClawPositionFallback = 8;
-        public static final double kClawPositionIntake = 0.75;
+        public static final double kClawPositionIntake = 1.6;
         public static final double kClawPositionL1 = 0.5;
-        public static final double kClawPositionL2 = 2.75;
-        public static final double kClawPositionL3 = 2.75;
-        public static final double kClawPositionL4 = 4;
+        public static final double kClawPositionL2 = 3.75;
+        public static final double kClawPositionL3 = 3.75;
+        public static final double kClawPositionL4 = 4.2;
         public static final double kClawPositionAlgaeProcesser = 15;
         public static final double kClawPositionAlgaeLow = 11;
         public static final double kClawPositionAlgaeHigh = 11;
@@ -124,6 +113,31 @@ public final class Constants {
         //public static final double kClawPositionSafe2Min = 5.5;
         //public static final double kClawPositionSafe2Max = 20.0;
 
+    }
+    public static final class AutoConstants {
+        public static final double kMaxSpeedMetersPerSecond = 1;
+        public static final double kMaxAccelerationMetersPerSecondSquared = 3; //3
+
+        public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
+            OperatorConstants.kMaxAngularSpeedRadiansPerSecond, OperatorConstants.kMaxAngularAcceleration);
+        public static final double kPXController = 0.7;
+        public static final double kPYController = 0.7;
+        public static final double kPThetaController = 2;
+
+        public static final double kLineLeftY = 7.2;
+        public static final double kLineRightY = 0.8;
+        public static final double kLineX = 7.2;
+
+        public static final double[] kReefXPositions = new double[] { 0, 6.4, 5.36, 3.57, 2.70, 3.57, 5.379 };
+        public static final double[] kReefYPositions = new double[] { 0, 4.0, 2.44, 2.50, 4.00, 5.53, 5.526 };
+        public static final double[] kReefThetas = new double[]     { 0, -120, -60,   60,   0,   120,  180  };
+
+        public static final double[] CoralIntakePositionsX = new double[] { 0, 1.13, 1.12 };
+        public static final double[] CoralIntakePositionsY = new double[] { 0, 6.98, 1.05 };
+        public static final double[] CoralIntakeThetas = new double[]     { 0, -55,   55  };
+
+
+        
     }
 
 

@@ -1,13 +1,15 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ManipulatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.ClawSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
-import pabeles.concurrency.ConcurrencyOps.Reset;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -25,9 +27,9 @@ public class ManuipulatorCommand extends Command {
     private final ClawSubsystem clawSubsystem;
     private final IntakeSubsystem intakeSubsystem;
     private boolean isGamePieceCoral = true; // true for coral, false for algae
-    private boolean isClawOut = false; // true for out, false for in
+    private boolean isClawOut = false; // true for out, false for in (Not functional or needed at the moment, should get rid of it for clarity)
     private int coralLevel = 0; // 5 Coral levels, intake, L1, L2, L3, and L4.
-    private int algaeLevel = 0; // 3 Algae levels, processer score, low, and high.
+    private int algaeLevel = 0; // 4 Algae levels, processer, low, high, and barge.
 
     public ManuipulatorCommand(ElevatorSubsystem elevatorSubsystem, ClawSubsystem clawSubsystem, IntakeSubsystem intakeSubsystem) {
         this.elevatorSubsystem = elevatorSubsystem;
@@ -40,11 +42,7 @@ public class ManuipulatorCommand extends Command {
     @Override
     public void initialize() {
         System.out.println("ManipulatorCommand initialized");
-        algaeLevel = 0;
-        coralLevel = 0;
         isClawOut = false;
-        isGamePieceCoral = true;
-        ResetEncoders();
     }
 
     @Override
@@ -69,7 +67,7 @@ public class ManuipulatorCommand extends Command {
             }
 
             //Either do this or update the pid like normal
-            JoystickButton ForceResetClawButton = new JoystickButton(driverJoystick, 2);
+            JoystickButton ForceResetClawButton = new JoystickButton(driverJoystick, 4);
             if (ForceResetClawButton.getAsBoolean()) {
                 clawSubsystem.ForceResetEncoders();
             } else {
@@ -123,14 +121,56 @@ public class ManuipulatorCommand extends Command {
     /** Run this by default with a reverse polarity button thing then run the other to score when that is clicked */
     public void IntakeGamepiece() {
         intakeSubsystem.UpdateIntakeInput();
+        
+        // Check if the coral sensor detects that it has picked up a coral
+        if (intakeSubsystem.CoralSensor.get()) {
+        }
     }
 
     public void OuttakeGamepiece() {
         intakeSubsystem.UpdateIntakeOutput();
+        // Check if the coral sensor detects that it has dropped a coral
+        
         if (!intakeSubsystem.CoralSensor.get()) {
-            return;
         }
     }
+
+    public Command IntakeGamepieceCommand() {
+        return new FunctionalCommand(
+            // Initialize
+            () -> {
+                // Optional initialization logic if needed
+            },
+            // Execute
+            () -> {
+                intakeSubsystem.UpdateIntakeInput();
+            },
+            // End
+            (interrupted) -> {
+                // Optional cleanup logic if needed
+            },
+            // IsFinished
+            () -> intakeSubsystem.CoralSensor.get() // Ends when the sensor is triggered
+        );
+    }
+        public Command OuttakeGamepieceCommand() {
+            return new FunctionalCommand(
+                // Initialize
+                () -> {
+                    // Optional initialization logic if needed
+                },
+                // Execute
+                () -> {
+                    intakeSubsystem.UpdateIntakeOutput();
+                },
+                // End
+                (interrupted) -> {
+                    // Optional cleanup logic if needed
+                },
+                // IsFinished
+                () -> !intakeSubsystem.CoralSensor.get() // Ends when the sensor is not triggered
+            );
+        }
 
     public void ResetStage() {
         if (isGamePieceCoral) {
@@ -176,6 +216,32 @@ public class ManuipulatorCommand extends Command {
         return;
     }
 
+    /** Sets the stage of the elevator, has input for gamepiece mode as well. */
+    public Command SetStage(int stageNumber, boolean gamePieceCoral) {
+    return new FunctionalCommand(
+        // Initialize
+        () -> {
+            if (!gamePieceCoral == isGamePieceCoral) {
+                SwapGamePiece();
+            }
+        },
+        // Execute
+        () -> {
+            if (gamePieceCoral) {
+                coralLevel = stageNumber;
+            } else {
+                algaeLevel = stageNumber;
+            }
+        },
+        // End
+        (interrupted) -> {
+            // Optional cleanup logic if needed
+        },
+        // IsFinished
+        () -> elevatorSubsystem.AtTarget() && clawSubsystem.AtTarget() // Ends when the elevator and claw are at their target positions
+    );
+}
+
     public void ResetClawPosition() {
         isClawOut = false;
     }
@@ -205,6 +271,7 @@ public class ManuipulatorCommand extends Command {
             UpdateElevatorPosition();
         } else {
             clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionFallback);
+            //UpdateElevatorPosition();
         }
     }
 

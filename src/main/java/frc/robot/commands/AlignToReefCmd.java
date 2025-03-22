@@ -12,15 +12,16 @@ import frc.robot.subsystems.SwerveSubsystem;
 public class AlignToReefCmd extends Command {
   private PIDController xController, yController, rotController;
   private SwerveSubsystem swerveSubsystem;
+  private String scorePosition;
   boolean atTarget = false;
 
-  public AlignToReefCmd(SwerveSubsystem swerveSubsystem) {
-    xController = new PIDController(1, 0.0, 0);  // Vertical movement
+  public AlignToReefCmd(SwerveSubsystem swerveSubsystem, String scorePosition) {
+    xController = new PIDController(1.5, 0.0, 0);  // Vertical movement
     yController = new PIDController(1.5, 0.0, 0);  // Horitontal movement
-    rotController = new PIDController(0.06, 0, 0);  // Rotation
+    rotController = new PIDController(0.07, 0, 0);  // Rotation
     this.swerveSubsystem = swerveSubsystem;
+    this.scorePosition = scorePosition;
     addRequirements(swerveSubsystem);
-
   }
 
   @Override
@@ -35,17 +36,30 @@ public class AlignToReefCmd extends Command {
   public void execute() {
     if (LimelightHelpers.getTV("")) {
       double[] postions = LimelightHelpers.getBotPose_TargetSpace("");
-      SmartDashboard.putNumber("x", postions[2]);
 
-      double xSpeed = xController.calculate(postions[2] + 0.65);
-      SmartDashboard.putNumber("xspeed", xSpeed);
-      double ySpeed = yController.calculate(postions[0]); //coral offset 0.21
+      double ySpeed;
+      double xSpeed;
+      // get speeds from positions the gamepiece is set to or something
+      if(scorePosition.contains("left")) {
+        ySpeed = yController.calculate(postions[0] + 0.21); // coral offset 0.21
+        xSpeed = xController.calculate(postions[2] + 0.95); // do not slam the claw into the reef
+      } else if(scorePosition.contains("right")) {
+        ySpeed = yController.calculate(postions[0] - 0.21);
+        xSpeed = xController.calculate(postions[2] + 0.95);
+      } else {
+        // algae
+        ySpeed = yController.calculate(postions[0]);
+        xSpeed = xController.calculate(postions[2] + 0.6);
+      }
+      
+      // get rest of speeds they should all be the same, can add them in to logic if they needs changing.
       double rotValue = rotController.calculate(postions[4]);
+      //set speeds
       swerveSubsystem.drive(xSpeed, ySpeed, rotValue);
-      if (xController.getError() < .2 && yController.getError() < .2 && rotController.getError() < 3) {
+      //if at target set to true to end command (workaround cause pid "atSetpoint()" is not working)
+      if (xController.getError() < .1 && yController.getError() < .1 && rotController.getError() < 1.5) {
         atTarget = true;
       }
-
     }
   }
 
