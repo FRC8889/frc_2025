@@ -24,6 +24,10 @@ public class ClawSubsystem extends SubsystemBase {
         
     }
 
+    public boolean isGamePieceCoral() {
+        return isGamePieceCoral;
+    }
+
     public void ResetEncoders() {
         clawMotor.getEncoder().setPosition(0);
         isGamePieceCoral = true;
@@ -31,7 +35,7 @@ public class ClawSubsystem extends SubsystemBase {
 
     public void ForceResetEncoders() {
         clawMotor.set(-0.5);
-        clawMotor.getEncoder().setPosition(0);
+        clawMotor.getEncoder().setPosition(-.25);
     }
 
     public void ResetPid() {
@@ -48,6 +52,7 @@ public class ClawSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Claw Encoder", GetClawEncoder());
         SmartDashboard.putNumber("tracking", tracking);
         SmartDashboard.putBoolean("Claw at target?", AtTarget());
+        RunClawPID();
     }
     
     /** Returns claw encoder reading. */    

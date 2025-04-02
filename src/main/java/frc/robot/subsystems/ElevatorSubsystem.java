@@ -4,8 +4,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -41,8 +39,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void periodic() {
         // Display current stage and encoder value on SmartDashboard
         SmartDashboard.putNumber("Elevator Encoder", GetCollectiveElevatorEncoder());
-        SmartDashboard.putBoolean("Elevator In Motion", InMotion());
-
+        SmartDashboard.putBoolean("Elevator at target?", AtTarget());
+        RunElevatorPID();
     }
 
     /** Toggles game piece mode starting from Coral. */

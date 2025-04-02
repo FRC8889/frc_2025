@@ -53,7 +53,7 @@ public final class Constants {
         public static final int kBRDriveID = 3;
         public static final int KBRTurningID = 3;
         public static final int kBREncoderID = 3;
-        public static final double kBREncoderOffset = 0.35 + Math.PI;
+        public static final double kBREncoderOffset = 0.25 + Math.PI;
         public static final int kBREncoderReversed = 1;
 
     }
@@ -67,7 +67,7 @@ public final class Constants {
         public static final int kDriverRotationAxis = 4;
         public static final int kDriverFieldOrientedButtonId = 6;
         
-        public static final double kDeadband = 0.08;
+        public static final double kDeadband = 0.06;
         
         public static final double kMaxDriveSpeedMetersPerSecond = 2.5; //2.5
         public static final double kMaxAngularSpeedRadiansPerSecond = 6; //6
@@ -85,8 +85,8 @@ public final class Constants {
 
         public static final double kElevatorPositionIntake = 0.5;
         public static final double kElevatorPositionL1 = 3;
-        public static final double kElevatorPositionL2 = 18;
-        public static final double kElevatorPositionL3 = 45.25;
+        public static final double kElevatorPositionL2 = 19.5;
+        public static final double kElevatorPositionL3 = 46.5;
         public static final double kElevatorPositionL4 = 95;
         public static final double kElevatorPositionAlgaeProcesser = 16;
         public static final double kElevatorPositionAlgaeLow = 33;
@@ -96,15 +96,15 @@ public final class Constants {
         
 
         public static final double kClawPositionFallback = 8;
-        public static final double kClawPositionIntake = 1.6;
+        public static final double kClawPositionIntake = 0.5;
         public static final double kClawPositionL1 = 0.5;
-        public static final double kClawPositionL2 = 3.75;
-        public static final double kClawPositionL3 = 3.75;
+        public static final double kClawPositionL2 = 2.85;
+        public static final double kClawPositionL3 = 2.85;
         public static final double kClawPositionL4 = 4.2;
         public static final double kClawPositionAlgaeProcesser = 15;
         public static final double kClawPositionAlgaeLow = 11;
         public static final double kClawPositionAlgaeHigh = 11;
-        public static final double kClawPositionAlgaeBarge = 4;
+        public static final double kClawPositionAlgaeBarge = 5.5;
 
 
         // Claw safe values

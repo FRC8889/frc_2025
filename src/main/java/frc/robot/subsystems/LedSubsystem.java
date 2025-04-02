@@ -24,6 +24,8 @@ public class LedSubsystem extends SubsystemBase {
         ledStrip.start();
         LEDPattern green = LEDPattern.solid(Color.kGreen);
         green.applyTo(ledBuffer);
+        ledStrip.start();
+
     }
 
     public void SetColor(int colorId) {

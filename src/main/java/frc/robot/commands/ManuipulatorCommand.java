@@ -26,10 +26,10 @@ public class ManuipulatorCommand extends Command {
     private final ElevatorSubsystem elevatorSubsystem;
     private final ClawSubsystem clawSubsystem;
     private final IntakeSubsystem intakeSubsystem;
-    private boolean isGamePieceCoral = true; // true for coral, false for algae
-    private boolean isClawOut = false; // true for out, false for in (Not functional or needed at the moment, should get rid of it for clarity)
-    private int coralLevel = 0; // 5 Coral levels, intake, L1, L2, L3, and L4.
-    private int algaeLevel = 0; // 4 Algae levels, processer, low, high, and barge.
+    public boolean isGamePieceCoral = true; // true for coral, false for algae
+    public boolean isClawOut = false; // true for out, false for in (Not functional or needed at the moment, should get rid of it for clarity)
+    public int coralLevel; // 5 Coral levels, intake, L1, L2, L3, and L4.
+    public int algaeLevel; // 4 Algae levels, processer, low, high, and barge.
 
     public ManuipulatorCommand(ElevatorSubsystem elevatorSubsystem, ClawSubsystem clawSubsystem, IntakeSubsystem intakeSubsystem) {
         this.elevatorSubsystem = elevatorSubsystem;
@@ -47,11 +47,12 @@ public class ManuipulatorCommand extends Command {
 
     @Override
     public void execute() {
-        // Run the stuffs to make it move
-        UpdateClawPosition();
-        UpdateElevatorPositionIfSafe();
-        elevatorSubsystem.RunElevatorPID();
+        //ignore unless teleop...
+        if (DriverStation.isTeleop()) {  //This has to be done because the command to move the elevator in auto actually has its own variables despite them only being declared once for some reason.
+            UpdateClawPosition();        //They conflict and make it jitter around
 
+            UpdateElevatorPositionIfSafe();
+        }
         SmartDashboard.putNumber("Elevator level", coralLevel + algaeLevel);
         SmartDashboard.putBoolean("Claw Position", isClawOut);
         SmartDashboard.putBoolean("Piece Type", isGamePieceCoral);
@@ -67,11 +68,16 @@ public class ManuipulatorCommand extends Command {
             }
 
             //Either do this or update the pid like normal
-            JoystickButton ForceResetClawButton = new JoystickButton(driverJoystick, 4);
-            if (ForceResetClawButton.getAsBoolean()) {
+            JoystickButton ForceResetElevatorButton = new JoystickButton(driverJoystick, 4);
+            if (ForceResetElevatorButton.getAsBoolean()) {
                 clawSubsystem.ForceResetEncoders();
-            } else {
-                clawSubsystem.RunClawPID();
+                coralLevel = 0;
+                algaeLevel = 0;
+                if(!isGamePieceCoral) {
+                    SwapGamePiece();
+                }
+                UpdateElevatorPosition();
+                UpdateClawPosition();
             }
 
             // Run Stage Cycles ONCE per click
@@ -115,8 +121,6 @@ public class ManuipulatorCommand extends Command {
         elevatorSubsystem.ResetEncoders();
         clawSubsystem.ResetEncoders();
     }
-       
-    
     
     /** Run this by default with a reverse polarity button thing then run the other to score when that is clicked */
     public void IntakeGamepiece() {
@@ -150,27 +154,28 @@ public class ManuipulatorCommand extends Command {
                 // Optional cleanup logic if needed
             },
             // IsFinished
-            () -> intakeSubsystem.CoralSensor.get() // Ends when the sensor is triggered
+            () -> intakeSubsystem.IsHoldingGamepiece() // Ends when gamepiece is detected
         );
     }
-        public Command OuttakeGamepieceCommand() {
-            return new FunctionalCommand(
-                // Initialize
-                () -> {
-                    // Optional initialization logic if needed
-                },
-                // Execute
-                () -> {
-                    intakeSubsystem.UpdateIntakeOutput();
-                },
-                // End
-                (interrupted) -> {
-                    // Optional cleanup logic if needed
-                },
-                // IsFinished
-                () -> !intakeSubsystem.CoralSensor.get() // Ends when the sensor is not triggered
-            );
-        }
+    public Command OuttakeGamepieceCommand() {
+        return new FunctionalCommand(
+            // Initialize
+            () -> {
+                // Optional initialization logic if needed
+            },
+            // Execute
+            () -> {
+                intakeSubsystem.UpdateIntakeOutput();
+            },
+            // End
+            (interrupted) -> {
+                intakeSubsystem.UpdateIntakeInput();
+                // Optional cleanup logic if needed
+            },
+            // IsFinished
+            () -> !intakeSubsystem.IsHoldingGamepiece() // Ends when gamepiece drop is detected
+        );
+    }
 
     public void ResetStage() {
         if (isGamePieceCoral) {
@@ -217,25 +222,32 @@ public class ManuipulatorCommand extends Command {
     }
 
     /** Sets the stage of the elevator, has input for gamepiece mode as well. */
-    public Command SetStage(int stageNumber, boolean gamePieceCoral) {
+    public Command SetStage(int stageNumber, boolean gamePieceCoral) {  //Cannot be run in teleop or will conflict due to isolated variable instances with the same name??? idk
     return new FunctionalCommand(
         // Initialize
         () -> {
-            if (!gamePieceCoral == isGamePieceCoral) {
+            if (gamePieceCoral != isGamePieceCoral) {
                 SwapGamePiece();
             }
-        },
-        // Execute
-        () -> {
+            
             if (gamePieceCoral) {
                 coralLevel = stageNumber;
             } else {
                 algaeLevel = stageNumber;
             }
-        },
+            UpdateClawPosition();
+            UpdateElevatorPositionIfSafe();
+            },
+        // Execute
+        () -> {
+            SmartDashboard.putNumber("Elevator level", coralLevel + algaeLevel);
+            UpdateClawPosition();
+            UpdateElevatorPositionIfSafe();
+            },
         // End
         (interrupted) -> {
             // Optional cleanup logic if needed
+            ForceUpdateClawPosition();  // The claw will be in its "target position" as in the safe position instead of the real target so one more run will set to actual target
         },
         // IsFinished
         () -> elevatorSubsystem.AtTarget() && clawSubsystem.AtTarget() // Ends when the elevator and claw are at their target positions
@@ -276,6 +288,7 @@ public class ManuipulatorCommand extends Command {
     }
 
     public void UpdateElevatorPosition() {
+        System.out.print(coralLevel);
         if (isGamePieceCoral) {
             if (coralLevel == 0) {
                 elevatorSubsystem.SetElevatorTargetPosition(ManipulatorConstants.kElevatorPositionIntake);
@@ -339,6 +352,20 @@ public class ManuipulatorCommand extends Command {
         }
     }
 
+    public void ForceUpdateClawPosition() {
+        if (coralLevel == 0) {
+            clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionIntake);
+        } else if (coralLevel == 1) {
+            clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionL1);
+        } else if (coralLevel == 2) {
+            clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionL2);
+        } else if (coralLevel == 3) {
+            clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionL3);
+        } else if (coralLevel == 4) {
+            clawSubsystem.SetClawTargetPosition(ManipulatorConstants.kClawPositionL4);
+        }
+    }   
+
     public void StopMotors() {
         elevatorSubsystem.StopMotors();
         clawSubsystem.StopMotors();
@@ -361,8 +388,5 @@ public class ManuipulatorCommand extends Command {
         return false;
      }
 
-    public static void setDefaultCommand(ManuipulatorCommand manuipulatorCommand) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setDefaultCommand'");
-    }
+
 }

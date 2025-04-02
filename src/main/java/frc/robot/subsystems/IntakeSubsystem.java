@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.ctre.phoenix6.controls.StaticBrake;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -9,13 +11,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 public class IntakeSubsystem extends SubsystemBase {
 
-    private final SparkMax IntakeMotor = new SparkMax(8, MotorType.kBrushless);
+    private final TalonFX IntakeMotor = new TalonFX(5);
     public final DigitalInput CoralSensor = new DigitalInput(0);
     
     private boolean isGamePieceCoral = true; // true for coral, false for algae
-    private double intakeSpeedCoral = 0.3;
-    private double outtakeSpeedCoral = -0.5;   
-    private double intakeSpeedAlgae = 0.65;
+    private double intakeSpeedCoral = 0.175;
+    private double outtakeSpeedCoral = -0.3;   
+    private double intakeSpeedAlgae = 0.3;
     private double outtakeSpeedAlgae = -0.75;
 
     public IntakeSubsystem() {
@@ -36,7 +38,12 @@ public class IntakeSubsystem extends SubsystemBase {
                 IntakeMotor.set(-intakeSpeedCoral);
             }
         } else {
-            IntakeMotor.set(intakeSpeedAlgae);
+            // Lower speed when stalled for algae
+            if (IntakeMotor.getTorqueCurrent().getValueAsDouble() < 30 && IntakeMotor.getVelocity().getValueAsDouble() > 1) {
+                IntakeMotor.set(intakeSpeedAlgae);
+            } else {
+                IntakeMotor.set(intakeSpeedAlgae / 1);
+            }
         }
     }
 
@@ -54,7 +61,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public boolean IsHoldingGamepiece() {
-        if (CoralSensor.get() || IntakeMotor.getOutputCurrent() > 20) {
+        if (CoralSensor.get() || IntakeMotor.getTorqueCurrent().getValueAsDouble() > 20) {
             return true;
         } else {
             return false;
